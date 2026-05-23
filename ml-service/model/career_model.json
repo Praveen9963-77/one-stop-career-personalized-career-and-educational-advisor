@@ -1,0 +1,419 @@
+{
+  "modelType": "knn",
+  "k": 9,
+  "features": [
+    "technical",
+    "analytical",
+    "creativity",
+    "communication",
+    "social",
+    "business",
+    "health_interest",
+    "arts_interest",
+    "problem_solving",
+    "academic_score"
+  ],
+  "source": "career_training_data.csv",
+  "rows": 18,
+  "careers": {
+    "Software Developer": {
+      "support": 2,
+      "educationPath": [
+        "B.Tech CSE / BCA",
+        "Data structures and web development",
+        "Internships and GitHub portfolio"
+      ],
+      "skillsToBuild": [
+        "JavaScript",
+        "Python",
+        "Databases",
+        "System design"
+      ]
+    },
+    "Data Analyst": {
+      "support": 2,
+      "educationPath": [
+        "B.Sc / B.Tech / BBA with analytics",
+        "Statistics and SQL",
+        "BI dashboards and case studies"
+      ],
+      "skillsToBuild": [
+        "Python",
+        "SQL",
+        "Excel",
+        "Data visualization"
+      ]
+    },
+    "UX Designer": {
+      "support": 2,
+      "educationPath": [
+        "Design degree or UX certification",
+        "Human-computer interaction",
+        "Portfolio with usability studies"
+      ],
+      "skillsToBuild": [
+        "User research",
+        "Wireframing",
+        "Figma",
+        "Accessibility"
+      ]
+    },
+    "Digital Marketing Specialist": {
+      "support": 2,
+      "educationPath": [
+        "BBA / BA / marketing certification",
+        "SEO and campaign analytics",
+        "Live campaign portfolio"
+      ],
+      "skillsToBuild": [
+        "SEO",
+        "Copywriting",
+        "Analytics",
+        "Content strategy"
+      ]
+    },
+    "Career Counselor": {
+      "support": 2,
+      "educationPath": [
+        "Psychology / education degree",
+        "Counseling certification",
+        "Supervised guidance practice"
+      ],
+      "skillsToBuild": [
+        "Active listening",
+        "Assessment design",
+        "Mentoring",
+        "Ethics"
+      ]
+    },
+    "Business Analyst": {
+      "support": 2,
+      "educationPath": [
+        "BBA / MBA / engineering plus business analytics",
+        "Process modeling",
+        "Industry case projects"
+      ],
+      "skillsToBuild": [
+        "Requirements analysis",
+        "Excel",
+        "SQL",
+        "Stakeholder management"
+      ]
+    },
+    "Healthcare Professional": {
+      "support": 2,
+      "educationPath": [
+        "BiPC / life sciences foundation",
+        "Healthcare degree path",
+        "Clinical exposure and certifications"
+      ],
+      "skillsToBuild": [
+        "Biology",
+        "Empathy",
+        "Documentation",
+        "Medical ethics"
+      ]
+    },
+    "Creative Media Designer": {
+      "support": 2,
+      "educationPath": [
+        "Fine arts / animation / media program",
+        "Tool specialization",
+        "Public creative portfolio"
+      ],
+      "skillsToBuild": [
+        "Visual design",
+        "Motion graphics",
+        "Storytelling",
+        "Brand systems"
+      ]
+    },
+    "Research Associate": {
+      "support": 2,
+      "educationPath": [
+        "Strong undergraduate academics",
+        "Research methodology",
+        "Projects, papers, or lab internships"
+      ],
+      "skillsToBuild": [
+        "Literature review",
+        "Statistics",
+        "Technical writing",
+        "Experiment design"
+      ]
+    }
+  },
+  "samples": [
+    {
+      "career": "Software Developer",
+      "vector": [
+        5.0,
+        4.0,
+        2.0,
+        3.0,
+        2.0,
+        2.0,
+        1.0,
+        1.0,
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "career": "Software Developer",
+      "vector": [
+        5.0,
+        5.0,
+        2.0,
+        2.0,
+        1.0,
+        2.0,
+        1.0,
+        1.0,
+        5.0,
+        5.0
+      ]
+    },
+    {
+      "career": "Data Analyst",
+      "vector": [
+        4.0,
+        5.0,
+        2.0,
+        3.0,
+        2.0,
+        3.0,
+        1.0,
+        1.0,
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "career": "Data Analyst",
+      "vector": [
+        3.0,
+        5.0,
+        2.0,
+        4.0,
+        2.0,
+        4.0,
+        1.0,
+        1.0,
+        4.0,
+        5.0
+      ]
+    },
+    {
+      "career": "UX Designer",
+      "vector": [
+        2.0,
+        3.0,
+        5.0,
+        4.0,
+        2.0,
+        3.0,
+        1.0,
+        5.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "career": "UX Designer",
+      "vector": [
+        3.0,
+        3.0,
+        5.0,
+        5.0,
+        3.0,
+        3.0,
+        1.0,
+        5.0,
+        3.0,
+        4.0
+      ]
+    },
+    {
+      "career": "Digital Marketing Specialist",
+      "vector": [
+        2.0,
+        2.0,
+        5.0,
+        5.0,
+        3.0,
+        4.0,
+        1.0,
+        4.0,
+        3.0,
+        3.0
+      ]
+    },
+    {
+      "career": "Digital Marketing Specialist",
+      "vector": [
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        3.0,
+        5.0,
+        1.0,
+        3.0,
+        3.0,
+        4.0
+      ]
+    },
+    {
+      "career": "Career Counselor",
+      "vector": [
+        2.0,
+        3.0,
+        2.0,
+        5.0,
+        5.0,
+        3.0,
+        2.0,
+        2.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "career": "Career Counselor",
+      "vector": [
+        1.0,
+        2.0,
+        3.0,
+        5.0,
+        5.0,
+        2.0,
+        2.0,
+        2.0,
+        4.0,
+        3.0
+      ]
+    },
+    {
+      "career": "Business Analyst",
+      "vector": [
+        2.0,
+        3.0,
+        2.0,
+        4.0,
+        3.0,
+        5.0,
+        1.0,
+        1.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "career": "Business Analyst",
+      "vector": [
+        3.0,
+        4.0,
+        2.0,
+        4.0,
+        3.0,
+        5.0,
+        1.0,
+        1.0,
+        4.0,
+        5.0
+      ]
+    },
+    {
+      "career": "Healthcare Professional",
+      "vector": [
+        2.0,
+        4.0,
+        2.0,
+        4.0,
+        5.0,
+        2.0,
+        5.0,
+        1.0,
+        4.0,
+        5.0
+      ]
+    },
+    {
+      "career": "Healthcare Professional",
+      "vector": [
+        1.0,
+        3.0,
+        2.0,
+        4.0,
+        5.0,
+        2.0,
+        5.0,
+        1.0,
+        4.0,
+        5.0
+      ]
+    },
+    {
+      "career": "Creative Media Designer",
+      "vector": [
+        2.0,
+        2.0,
+        5.0,
+        4.0,
+        2.0,
+        3.0,
+        1.0,
+        5.0,
+        3.0,
+        3.0
+      ]
+    },
+    {
+      "career": "Creative Media Designer",
+      "vector": [
+        1.0,
+        2.0,
+        5.0,
+        4.0,
+        2.0,
+        2.0,
+        1.0,
+        5.0,
+        3.0,
+        3.0
+      ]
+    },
+    {
+      "career": "Research Associate",
+      "vector": [
+        4.0,
+        5.0,
+        3.0,
+        3.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        5.0,
+        5.0
+      ]
+    },
+    {
+      "career": "Research Associate",
+      "vector": [
+        3.0,
+        5.0,
+        3.0,
+        4.0,
+        3.0,
+        2.0,
+        3.0,
+        2.0,
+        5.0,
+        5.0
+      ]
+    }
+  ],
+  "description": "KNN recommends the career followed by the most similar historical student profiles."
+}

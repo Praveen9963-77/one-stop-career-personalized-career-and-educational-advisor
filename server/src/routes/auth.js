@@ -6,7 +6,7 @@ import { requireAuth } from "../middleware/auth.js";
 import User from "../models/User.js";
 
 const router = express.Router();
-const clientUrl = process.env.CLIENT_URL || "http://127.0.0.1:5174";
+const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
 
 function signToken(user) {
   return jwt.sign(
@@ -79,19 +79,6 @@ router.get("/google", (req, res, next) => {
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false, failureRedirect: `${clientUrl}/?oauth=failed` }),
-  (req, res) => redirectWithToken(res, req.user)
-);
-
-router.get("/github", (req, res, next) => {
-  if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
-    return res.status(503).json({ message: "GitHub OAuth is not configured" });
-  }
-  passport.authenticate("github", { scope: ["user:email"], session: false })(req, res, next);
-});
-
-router.get(
-  "/github/callback",
-  passport.authenticate("github", { session: false, failureRedirect: `${clientUrl}/?oauth=failed` }),
   (req, res) => redirectWithToken(res, req.user)
 );
 

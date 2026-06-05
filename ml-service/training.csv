@@ -1,0 +1,201 @@
+﻿Math_Score,Physics_Score,Chemistry_Score,Biology_Score,English_Score,GPA,Coding_Skill,Problem_Solving,Data_Analysis,Web_Development,AI_Interest,Communication,Leadership,Teamwork,Public_Speaking,Creativity,Analytical_Thinking,Attention_To_Detail,Stress_Handling,Research_Interest,Social_Service_Interest,Interest_Domain,Preferred_Work,Higher_Studies_Interest,Recommended_Career,Recommended_Course
+47,41,87,57,97,7.68,4,3,2,9,2,10,10,1,10,2,4,4,9,10,1,Law,Field Work,Yes,Lawyer,LLB
+57,91,95,40,88,6.32,3,7,6,5,3,10,10,6,10,7,2,6,6,10,5,Business,Research,Yes,Digital Marketer,BBA Marketing
+79,96,95,63,96,8.44,4,2,1,4,5,9,6,2,10,5,8,6,3,6,6,Law,Independent,Yes,Lawyer,LLB
+82,90,50,69,64,7.06,5,7,4,6,1,4,1,6,7,5,9,4,10,6,4,Engineering,Independent,No,Mechanical Engineer,B.Tech Mechanical
+82,82,56,87,77,8.12,7,9,7,6,4,3,9,8,2,1,10,3,3,7,10,Engineering,Remote,Yes,Civil Engineer,B.Tech Civil
+79,86,47,83,96,7.3,9,8,6,2,10,7,3,8,1,5,7,3,9,2,5,Technology,Team,Yes,Software Engineer,B.Tech CSE
+91,63,96,93,91,7.6,10,8,1,4,8,2,2,8,2,9,8,3,8,9,3,Technology,Research,No,Data Scientist,B.Sc Data Science
+97,73,68,47,55,8.68,4,2,6,1,10,7,4,10,8,1,2,1,4,2,8,Education,Independent,No,Teacher,B.Ed
+82,93,99,96,76,6.99,10,6,4,8,7,4,2,2,7,6,8,7,8,1,2,Engineering,Independent,Yes,Mechanical Engineer,B.Tech Mechanical
+82,71,67,51,57,6.01,8,9,2,8,9,2,1,9,1,2,7,3,7,8,8,Engineering,Field Work,Yes,Mechanical Engineer,B.Tech Mechanical
+99,90,90,69,58,6.23,7,9,8,3,4,10,4,1,6,10,1,6,1,1,10,Design,Remote,No,Graphic Designer,B.Des
+81,51,44,78,44,6.52,9,8,2,10,9,10,10,1,10,2,9,10,10,9,6,Technology,Research,No,Data Scientist,B.Sc Data Science
+60,99,88,99,44,9.94,1,8,10,10,2,8,9,9,9,5,3,6,2,4,10,Education,Remote,No,Teacher,B.Ed
+83,92,75,59,99,6.18,7,7,5,2,8,9,3,5,5,10,10,6,4,5,9,Technology,Research,No,Software Engineer,B.Tech CSE
+84,56,50,87,68,8.73,9,7,9,1,7,2,3,9,1,6,9,9,3,7,3,Technology,Team,Yes,AI Engineer,B.Tech AI
+89,75,96,95,66,7.4,10,3,4,3,3,10,7,7,10,7,4,5,3,2,7,Business,Independent,Yes,Business Analyst,BBA
+41,82,83,99,61,8.42,5,2,5,6,9,7,9,6,1,2,5,3,9,9,9,Medicine,Remote,Yes,Doctor,MBBS
+96,97,76,52,56,8.22,10,9,1,9,8,4,6,7,2,6,10,6,2,5,9,Technology,Independent,No,Data Scientist,B.Sc Data Science
+89,100,64,83,87,7.14,8,10,10,5,6,9,1,5,5,4,8,10,10,6,8,Technology,Remote,No,Cybersecurity Analyst,B.Tech Cyber Security
+45,92,100,88,55,9.57,5,4,4,3,1,10,7,7,7,2,8,7,10,4,7,Business,Team,No,Business Analyst,BBA
+92,51,91,84,73,7.04,10,8,9,4,9,8,3,8,9,9,10,6,8,10,9,Technology,Independent,No,Cybersecurity Analyst,B.Tech Cyber Security
+57,89,89,73,97,7.63,4,5,8,2,5,8,9,6,8,9,2,3,3,4,7,Law,Remote,Yes,Lawyer,LLB
+66,43,53,93,66,6.12,7,10,1,10,7,8,1,8,10,7,7,9,9,10,9,Education,Research,No,Teacher,B.Ed
+83,91,65,86,87,7.31,8,3,10,9,1,9,9,10,8,2,7,3,8,3,1,Law,Field Work,No,Lawyer,LLB
+88,100,93,66,56,6.46,2,8,1,9,1,9,4,2,10,8,4,4,1,10,3,Design,Independent,Yes,Graphic Designer,B.Des
+84,56,89,63,50,9.13,10,10,2,3,5,7,10,8,7,10,7,7,4,2,10,Education,Research,Yes,Teacher,B.Ed
+84,83,63,44,72,7.29,6,8,7,8,2,7,6,8,3,7,10,9,5,10,9,Engineering,Independent,No,Mechanical Engineer,B.Tech Mechanical
+92,96,68,55,88,8.88,7,8,10,7,7,1,8,6,3,8,7,6,5,6,5,Technology,Field Work,No,Data Scientist,B.Sc Data Science
+93,87,84,70,81,8.81,8,8,1,2,5,4,7,4,5,10,8,8,9,9,6,Engineering,Research,No,Mechanical Engineer,B.Tech Mechanical
+56,54,47,86,52,6.06,6,2,9,3,4,7,8,5,7,9,10,5,2,4,5,Design,Remote,Yes,Graphic Designer,B.Des
+87,42,43,75,58,6.6,10,7,2,1,7,5,8,8,8,6,7,1,5,8,2,Technology,Remote,Yes,AI Engineer,B.Tech AI
+45,55,47,75,88,8.5,7,10,10,10,4,6,7,8,6,10,10,7,5,10,10,Design,Research,Yes,Graphic Designer,B.Des
+45,50,55,51,100,7.7,2,3,1,7,8,10,7,5,10,4,5,5,8,2,4,Law,Remote,No,Lawyer,LLB
+81,49,72,94,92,8.41,3,2,1,3,5,10,10,5,8,2,8,5,10,8,7,Medicine,Team,No,Doctor,MBBS
+86,83,93,95,76,9.43,10,9,5,10,6,3,8,9,8,5,9,10,7,8,2,Technology,Research,No,Data Scientist,B.Sc Data Science
+81,71,58,82,100,6.81,9,10,1,8,6,6,5,6,2,7,10,1,9,8,7,Technology,Remote,Yes,Cybersecurity Analyst,B.Tech Cyber Security
+95,58,68,96,84,8.82,8,10,1,10,10,3,5,9,1,9,9,2,4,2,8,Technology,Field Work,Yes,AI Engineer,B.Tech AI
+70,55,69,75,49,7.33,7,4,10,9,3,8,5,9,10,9,5,1,5,5,8,Education,Remote,No,Teacher,B.Ed
+78,99,60,95,52,8.89,10,7,7,4,6,1,6,8,7,7,10,8,1,3,9,Technology,Field Work,No,Cybersecurity Analyst,B.Tech Cyber Security
+49,44,70,90,98,9.04,6,10,7,2,6,8,6,6,9,9,1,10,2,4,5,Law,Team,Yes,Lawyer,LLB
+50,84,59,97,41,9.65,1,6,1,5,6,10,7,10,8,9,7,10,3,3,9,Education,Independent,Yes,Teacher,B.Ed
+69,80,73,95,56,7.44,1,8,5,9,3,2,8,6,10,5,7,5,10,10,8,Medicine,Research,No,Doctor,MBBS
+90,90,93,82,65,9.15,5,8,10,1,10,8,5,4,10,6,6,4,10,5,3,Engineering,Team,Yes,Civil Engineer,B.Tech Civil
+63,86,48,45,98,9.02,5,6,7,3,4,7,9,6,8,9,5,3,5,8,5,Business,Independent,No,Digital Marketer,BBA Marketing
+86,83,65,94,90,7.31,9,6,2,7,1,8,10,2,10,6,5,10,7,6,2,Law,Remote,Yes,Lawyer,LLB
+81,44,83,97,69,9.33,5,7,2,3,1,1,5,8,2,2,4,9,10,6,8,Medicine,Remote,No,Doctor,MBBS
+77,100,57,42,84,6.97,8,7,8,8,8,6,2,6,9,6,7,7,5,4,2,Technology,Independent,No,Cybersecurity Analyst,B.Tech Cyber Security
+53,44,93,88,75,8.36,4,10,4,4,6,8,6,8,8,3,3,9,5,3,2,Business,Team,Yes,Digital Marketer,BBA Marketing
+89,43,48,87,66,7.71,7,7,2,8,9,6,9,10,2,8,10,4,10,1,9,Technology,Team,No,AI Engineer,B.Tech AI
+85,98,68,44,97,8.88,2,6,10,3,2,10,5,6,7,9,6,7,10,9,10,Education,Independent,No,Teacher,B.Ed
+78,96,54,66,61,9.83,9,8,7,2,10,7,6,5,6,3,7,2,2,2,2,Technology,Remote,No,Cybersecurity Analyst,B.Tech Cyber Security
+82,47,66,62,95,9.23,7,1,5,10,5,7,8,10,8,4,3,8,4,2,6,Business,Remote,No,Business Analyst,BBA
+79,83,81,75,41,7.68,10,5,1,3,5,7,10,7,10,3,3,10,7,2,3,Business,Research,Yes,Digital Marketer,BBA Marketing
+83,59,86,60,89,6.44,8,7,2,1,9,3,10,1,2,5,9,7,8,10,8,Technology,Remote,No,AI Engineer,B.Tech AI
+73,82,59,42,54,8.23,7,10,1,1,4,8,4,9,8,5,6,2,1,8,10,Education,Research,Yes,Teacher,B.Ed
+97,95,87,42,67,6.97,9,7,2,6,6,7,10,7,7,5,10,7,1,6,3,Technology,Remote,No,Data Scientist,B.Sc Data Science
+83,45,65,95,59,6.71,8,8,6,3,6,9,2,9,9,4,8,6,3,4,2,Technology,Field Work,Yes,Cybersecurity Analyst,B.Tech Cyber Security
+88,76,88,77,68,6.23,10,10,6,6,3,9,2,9,10,5,5,10,1,6,6,Education,Research,Yes,Teacher,B.Ed
+89,95,94,45,79,8.58,7,9,7,8,10,9,1,8,10,4,7,10,8,9,3,Technology,Team,Yes,Data Scientist,B.Sc Data Science
+85,68,78,89,73,8.33,10,3,6,6,5,7,7,6,10,1,6,2,9,6,8,Medicine,Independent,No,Doctor,MBBS
+59,81,84,82,65,6.77,3,10,2,5,9,8,7,8,10,2,7,9,6,1,6,Business,Independent,No,Business Analyst,BBA
+88,58,94,90,46,7.14,9,8,9,1,10,10,3,10,7,3,10,3,10,3,8,Technology,Field Work,Yes,AI Engineer,B.Tech AI
+74,55,90,81,90,9.74,8,4,6,10,8,8,5,7,9,9,7,3,9,10,10,Medicine,Remote,No,Doctor,MBBS
+77,45,88,50,57,9.72,9,8,3,7,8,4,8,6,1,7,7,7,9,6,4,Technology,Research,No,Data Scientist,B.Sc Data Science
+99,42,58,98,93,6.19,9,8,8,8,6,1,2,1,5,4,9,9,10,9,7,Technology,Field Work,Yes,AI Engineer,B.Tech AI
+90,79,69,44,80,8.09,8,10,9,1,9,10,6,3,10,7,1,10,6,4,10,Law,Research,No,Lawyer,LLB
+79,74,72,90,72,9.32,7,9,7,8,7,7,6,5,1,6,9,6,4,2,10,Technology,Field Work,No,Data Scientist,B.Sc Data Science
+94,90,51,91,48,7.43,2,8,1,5,4,1,4,1,6,5,7,7,9,8,5,Engineering,Team,Yes,Civil Engineer,B.Tech Civil
+61,57,47,91,92,6.32,7,7,8,7,6,9,6,8,9,9,5,2,7,2,7,Law,Research,Yes,Lawyer,LLB
+68,78,85,67,50,6.5,8,6,8,1,6,9,7,5,5,10,7,6,9,3,1,Design,Independent,Yes,Graphic Designer,B.Des
+63,63,64,100,78,8,1,10,3,8,6,8,7,2,10,3,9,6,7,6,5,Law,Field Work,Yes,Lawyer,LLB
+87,87,89,56,85,9.41,8,8,10,5,8,4,2,3,2,8,8,8,2,6,6,Engineering,Independent,Yes,Mechanical Engineer,B.Tech Mechanical
+72,54,47,52,90,9.29,3,4,8,1,6,10,10,9,10,9,3,10,2,2,5,Business,Team,No,Business Analyst,BBA
+85,81,44,68,69,7,8,9,3,9,6,3,3,7,9,1,9,9,3,5,3,Technology,Remote,Yes,AI Engineer,B.Tech AI
+48,80,59,79,74,7.67,2,9,3,10,10,7,3,10,9,10,10,1,1,2,1,Design,Team,No,Graphic Designer,B.Des
+96,80,74,58,81,6.52,5,8,4,7,5,9,2,8,9,8,7,8,8,4,9,Education,Research,Yes,Teacher,B.Ed
+76,94,60,55,69,9.98,2,9,8,4,3,2,1,5,7,10,7,4,3,6,10,Engineering,Field Work,No,Mechanical Engineer,B.Tech Mechanical
+96,59,71,41,45,8.91,7,9,8,4,4,7,6,9,8,5,8,10,8,5,8,Education,Field Work,Yes,Teacher,B.Ed
+42,65,43,76,75,9.02,4,6,9,5,2,9,8,10,9,5,10,10,2,3,2,Business,Independent,No,Business Analyst,BBA
+72,65,72,42,42,8.83,1,3,6,8,9,9,10,10,10,3,6,10,6,3,7,Business,Research,No,Digital Marketer,BBA Marketing
+92,41,63,61,83,9.79,2,7,10,5,1,8,8,7,7,10,4,1,10,8,10,Education,Team,No,Teacher,B.Ed
+41,68,84,85,49,8.44,7,4,7,9,10,8,1,3,9,4,9,6,9,8,9,Medicine,Independent,No,Doctor,MBBS
+57,75,79,84,100,7.39,5,5,4,8,6,8,6,9,5,5,2,10,9,6,7,Medicine,Field Work,No,Doctor,MBBS
+56,87,70,53,88,6.4,9,5,9,5,3,9,9,10,10,4,1,9,4,4,1,Law,Independent,Yes,Lawyer,LLB
+87,99,50,66,81,6.04,10,8,4,5,6,5,1,2,10,4,9,1,3,7,3,Technology,Remote,Yes,Software Engineer,B.Tech CSE
+46,99,61,58,69,8.44,9,9,8,3,9,9,10,7,8,6,3,8,5,3,1,Business,Field Work,No,Digital Marketer,BBA Marketing
+83,60,45,65,82,7.86,9,8,3,8,6,4,1,5,7,4,7,5,6,5,10,Technology,Independent,Yes,Cybersecurity Analyst,B.Tech Cyber Security
+99,72,99,97,96,7.79,8,8,5,6,10,4,4,3,8,3,7,10,6,7,9,Technology,Research,No,Cybersecurity Analyst,B.Tech Cyber Security
+100,76,47,43,93,7.66,7,10,4,10,10,3,3,6,9,8,8,4,10,8,2,Technology,Remote,No,Data Scientist,B.Sc Data Science
+84,69,83,91,59,7.5,10,8,5,1,9,10,2,1,7,6,8,9,1,2,8,Technology,Field Work,Yes,Software Engineer,B.Tech CSE
+95,98,98,64,64,7.38,2,9,3,6,2,10,9,7,8,3,4,1,1,5,9,Education,Research,No,Teacher,B.Ed
+99,96,77,94,47,8.02,1,7,10,1,4,4,2,2,10,1,8,10,7,7,8,Medicine,Research,No,Doctor,MBBS
+92,98,85,97,60,9.14,10,10,6,4,5,3,9,4,7,5,5,1,9,9,7,Medicine,Research,No,Doctor,MBBS
+77,78,49,59,64,8.59,3,8,8,4,4,5,3,8,1,9,7,7,9,9,3,Engineering,Field Work,No,Civil Engineer,B.Tech Civil
+45,74,86,93,52,9.66,1,5,7,10,10,8,7,6,10,9,4,8,4,6,5,Business,Remote,Yes,Business Analyst,BBA
+81,80,98,55,75,8.25,6,6,7,8,9,6,5,5,6,9,9,8,2,8,6,Engineering,Independent,Yes,Civil Engineer,B.Tech Civil
+93,90,56,75,99,6.67,10,9,7,5,3,4,6,4,7,10,9,8,9,6,5,Engineering,Research,No,Civil Engineer,B.Tech Civil
+86,86,74,71,51,6.03,7,10,9,1,6,1,1,7,3,4,10,3,1,4,9,Technology,Remote,No,AI Engineer,B.Tech AI
+83,41,73,86,57,7.84,10,7,1,9,9,3,2,2,9,3,9,4,10,9,5,Technology,Independent,No,Cybersecurity Analyst,B.Tech Cyber Security
+86,71,83,92,94,9.61,2,7,2,7,7,7,9,8,1,1,7,2,8,7,6,Engineering,Remote,Yes,Civil Engineer,B.Tech Civil
+57,42,99,44,83,9.02,5,9,10,1,3,10,1,10,9,3,7,2,5,3,9,Education,Independent,Yes,Teacher,B.Ed
+81,87,72,87,62,6.74,1,9,7,4,2,6,10,10,10,7,9,1,5,8,8,Engineering,Remote,Yes,Civil Engineer,B.Tech Civil
+64,45,89,79,99,6.35,4,2,2,5,3,9,7,7,8,6,2,2,1,5,8,Law,Field Work,No,Lawyer,LLB
+75,75,72,66,46,7.08,1,2,6,9,2,8,10,9,8,1,5,7,7,2,7,Education,Research,Yes,Teacher,B.Ed
+49,44,50,67,57,7.76,7,5,8,2,6,10,4,8,10,10,4,8,2,3,8,Education,Field Work,Yes,Teacher,B.Ed
+78,48,59,60,93,6.72,4,8,6,3,7,8,10,8,10,4,6,7,5,7,6,Law,Remote,Yes,Lawyer,LLB
+93,86,69,100,85,8.81,10,10,5,2,8,8,3,5,4,5,7,7,7,2,8,Technology,Remote,No,Software Engineer,B.Tech CSE
+80,98,45,46,89,9.09,4,6,3,10,1,10,8,9,10,2,1,2,5,4,9,Business,Remote,Yes,Digital Marketer,BBA Marketing
+84,93,62,41,70,6.27,2,8,7,2,2,3,6,5,6,8,9,9,8,6,8,Engineering,Team,Yes,Civil Engineer,B.Tech Civil
+82,70,94,61,81,7.8,2,7,4,9,3,9,3,6,9,7,10,4,7,3,3,Engineering,Field Work,No,Civil Engineer,B.Tech Civil
+94,85,53,53,57,9.38,10,7,2,9,8,6,6,4,8,2,9,8,9,6,10,Technology,Remote,No,Cybersecurity Analyst,B.Tech Cyber Security
+93,83,85,91,59,8.54,10,10,2,3,9,2,4,5,2,3,8,3,9,7,7,Technology,Independent,Yes,AI Engineer,B.Tech AI
+92,84,58,48,51,6.33,6,7,10,1,6,1,8,3,4,7,9,9,8,7,8,Engineering,Team,No,Mechanical Engineer,B.Tech Mechanical
+58,42,76,97,74,7.19,5,3,8,10,8,9,9,2,10,2,5,9,7,7,10,Medicine,Team,No,Doctor,MBBS
+56,62,95,92,45,9.92,8,2,4,4,10,9,10,10,8,10,3,4,4,1,8,Education,Research,No,Teacher,B.Ed
+76,57,100,94,72,7.81,2,3,7,1,5,9,3,4,8,10,4,7,8,3,10,Design,Team,No,Graphic Designer,B.Des
+83,87,57,84,99,8.31,9,9,8,6,10,1,2,8,6,2,9,7,4,7,4,Technology,Remote,No,Cybersecurity Analyst,B.Tech Cyber Security
+90,61,97,83,88,7.49,1,1,2,8,1,7,3,8,9,1,7,4,3,5,6,Education,Independent,No,Teacher,B.Ed
+78,80,59,86,84,6.92,10,8,2,2,6,4,8,2,3,10,10,9,8,1,1,Technology,Team,No,Software Engineer,B.Tech CSE
+89,91,46,60,63,6.35,5,7,7,3,3,2,9,10,1,10,9,8,6,4,3,Engineering,Team,No,Civil Engineer,B.Tech Civil
+91,47,77,86,64,9.14,8,10,6,3,6,5,2,4,9,10,9,10,5,1,5,Technology,Independent,Yes,AI Engineer,B.Tech AI
+64,47,55,71,80,6.16,10,2,9,1,6,7,3,6,9,7,6,9,3,8,7,Education,Team,Yes,Teacher,B.Ed
+87,58,80,85,72,6.23,7,9,7,2,7,9,10,3,5,2,10,2,9,4,3,Technology,Team,No,Cybersecurity Analyst,B.Tech Cyber Security
+98,69,79,78,43,7.09,7,7,2,1,9,1,3,8,6,9,9,5,3,6,3,Technology,Team,No,Cybersecurity Analyst,B.Tech Cyber Security
+85,76,80,44,71,6.18,8,9,6,1,8,6,3,6,6,8,2,10,2,4,9,Design,Research,Yes,Graphic Designer,B.Des
+82,49,51,99,94,9.46,7,10,7,4,9,4,7,6,5,2,7,6,2,9,1,Technology,Research,Yes,Cybersecurity Analyst,B.Tech Cyber Security
+45,75,69,40,63,8.54,4,5,10,5,10,7,7,10,9,8,4,9,4,3,1,Business,Team,No,Business Analyst,BBA
+40,88,82,64,94,8.02,5,2,4,9,4,10,6,10,7,5,2,1,4,9,7,Business,Field Work,No,Business Analyst,BBA
+79,76,43,67,82,7.26,7,8,5,5,9,7,6,6,8,5,10,2,4,3,10,Technology,Team,Yes,Data Scientist,B.Sc Data Science
+91,79,53,68,59,6.12,8,7,2,2,3,5,10,1,4,6,8,2,4,6,7,Engineering,Field Work,Yes,Mechanical Engineer,B.Tech Mechanical
+75,87,75,55,46,9.24,8,2,3,2,1,7,4,6,8,7,6,2,10,10,9,Education,Team,Yes,Teacher,B.Ed
+47,42,100,69,43,8.59,3,10,7,7,8,7,10,10,8,6,4,3,5,5,8,Business,Field Work,Yes,Business Analyst,BBA
+87,75,70,43,45,8.39,9,8,3,7,8,9,4,9,1,7,7,8,9,8,6,Technology,Team,No,Cybersecurity Analyst,B.Tech Cyber Security
+43,91,70,73,62,8.79,10,4,3,2,4,8,5,9,10,10,10,7,6,3,3,Design,Remote,Yes,Graphic Designer,B.Des
+91,84,62,100,76,6.81,10,7,10,4,10,9,5,3,8,1,9,1,4,10,4,Technology,Independent,Yes,Software Engineer,B.Tech CSE
+85,51,98,91,94,9.17,6,1,1,3,10,9,7,7,10,2,6,7,10,2,6,Business,Field Work,No,Business Analyst,BBA
+60,51,85,75,94,8.56,10,6,4,10,3,9,7,5,10,3,1,10,7,10,1,Law,Team,Yes,Lawyer,LLB
+49,61,87,44,55,9.54,6,6,3,2,6,10,1,9,10,4,2,6,5,2,7,Education,Field Work,Yes,Teacher,B.Ed
+80,74,64,46,93,9.94,7,7,4,3,10,2,1,5,1,6,9,2,2,6,3,Technology,Field Work,No,Cybersecurity Analyst,B.Tech Cyber Security
+71,82,100,81,50,9.36,10,10,3,1,2,6,4,4,7,9,10,5,5,5,4,Engineering,Independent,Yes,Civil Engineer,B.Tech Civil
+77,40,67,45,58,7.48,10,8,4,2,9,4,3,5,2,8,9,5,7,8,8,Technology,Field Work,No,Software Engineer,B.Tech CSE
+92,68,69,56,54,6.32,10,8,1,3,8,2,6,9,7,10,10,9,1,7,9,Technology,Team,No,Software Engineer,B.Tech CSE
+80,93,73,91,76,7.55,10,6,2,8,3,3,4,4,3,1,6,2,7,4,3,Engineering,Field Work,No,Mechanical Engineer,B.Tech Mechanical
+95,79,57,73,69,9.51,1,8,10,9,7,2,7,3,3,10,10,10,2,2,10,Engineering,Research,Yes,Mechanical Engineer,B.Tech Mechanical
+75,71,76,78,70,9.37,9,9,5,7,8,10,10,7,1,7,9,4,1,8,5,Technology,Team,No,Cybersecurity Analyst,B.Tech Cyber Security
+48,59,92,89,89,9.52,6,5,7,10,2,4,8,4,7,8,9,6,8,10,10,Medicine,Team,Yes,Doctor,MBBS
+90,96,93,52,93,8.21,10,8,1,8,10,6,4,5,6,8,10,7,2,1,4,Technology,Research,No,AI Engineer,B.Tech AI
+90,97,56,87,93,7.01,8,8,1,7,7,3,10,4,4,4,7,5,7,9,1,Technology,Research,Yes,AI Engineer,B.Tech AI
+79,91,57,67,97,6.26,7,9,8,5,4,8,5,9,10,7,6,2,1,9,6,Engineering,Research,No,Civil Engineer,B.Tech Civil
+60,95,57,56,87,8.83,5,4,3,9,4,10,10,7,8,3,1,8,5,5,7,Law,Remote,No,Lawyer,LLB
+61,86,72,100,83,8.98,9,8,6,9,5,3,9,3,5,2,8,3,9,7,8,Medicine,Research,No,Doctor,MBBS
+88,96,61,63,56,7.37,7,8,8,2,7,1,10,10,10,2,8,4,9,2,7,Technology,Remote,No,Cybersecurity Analyst,B.Tech Cyber Security
+49,60,95,85,51,9.86,2,8,6,3,6,10,1,9,10,4,3,10,3,8,9,Education,Field Work,Yes,Teacher,B.Ed
+80,74,52,86,63,7.82,7,7,9,4,8,1,4,4,6,5,9,2,7,9,10,Technology,Remote,No,Software Engineer,B.Tech CSE
+73,61,67,96,83,9.51,3,6,8,6,4,7,8,6,10,4,3,4,1,10,9,Business,Research,Yes,Digital Marketer,BBA Marketing
+91,73,78,43,82,8.49,2,8,1,2,7,8,7,2,9,5,10,3,4,1,5,Engineering,Independent,No,Mechanical Engineer,B.Tech Mechanical
+76,97,46,72,86,6.94,10,8,5,2,8,8,4,10,4,5,10,4,6,7,5,Technology,Team,Yes,Cybersecurity Analyst,B.Tech Cyber Security
+45,98,47,93,84,7.7,8,3,2,9,2,9,8,4,10,5,5,8,1,2,3,Law,Team,Yes,Lawyer,LLB
+87,88,96,42,40,6.53,10,10,6,6,6,10,5,2,6,6,8,2,7,7,8,Technology,Team,No,Data Scientist,B.Sc Data Science
+83,66,98,77,70,8.08,9,7,3,10,8,6,10,1,3,8,8,2,7,8,1,Technology,Remote,Yes,AI Engineer,B.Tech AI
+85,82,86,55,70,8.57,9,7,3,9,10,1,1,3,9,8,8,3,2,8,6,Technology,Field Work,Yes,Data Scientist,B.Sc Data Science
+45,69,100,99,76,9.8,8,2,8,8,6,2,8,1,2,7,7,1,8,9,9,Medicine,Research,Yes,Doctor,MBBS
+97,54,94,69,61,6.56,7,7,10,8,9,8,2,2,4,1,8,6,5,9,9,Technology,Field Work,No,Software Engineer,B.Tech CSE
+75,79,52,52,47,9.12,7,10,8,4,10,2,7,1,10,2,10,8,10,9,3,Technology,Independent,No,Data Scientist,B.Sc Data Science
+74,83,86,92,48,7.2,2,10,10,10,6,9,7,7,10,4,10,7,6,5,8,Engineering,Remote,Yes,Civil Engineer,B.Tech Civil
+85,87,99,75,80,6.1,4,4,4,10,5,9,9,6,7,9,6,2,6,9,8,Business,Independent,No,Business Analyst,BBA
+82,43,52,57,88,7.67,9,7,5,3,9,5,4,9,1,6,10,2,10,9,4,Technology,Research,No,Software Engineer,B.Tech CSE
+82,71,87,56,52,8.23,10,8,4,6,10,9,10,4,4,5,9,3,2,3,3,Engineering,Independent,Yes,Mechanical Engineer,B.Tech Mechanical
+80,94,56,40,61,8.15,7,8,1,3,10,10,1,10,5,8,10,9,6,2,6,Technology,Team,Yes,AI Engineer,B.Tech AI
+54,96,53,82,61,7.54,6,6,5,4,10,7,8,9,7,2,6,8,4,10,10,Business,Remote,Yes,Business Analyst,BBA
+90,72,98,73,92,9.46,6,7,9,8,8,1,5,4,6,9,7,2,3,9,9,Engineering,Field Work,Yes,Civil Engineer,B.Tech Civil
+83,74,93,84,96,7.73,10,10,3,1,9,6,1,2,2,1,10,5,9,2,10,Technology,Team,Yes,Data Scientist,B.Sc Data Science
+96,47,74,40,81,6.88,7,10,10,1,10,6,9,2,5,5,8,2,5,8,7,Technology,Field Work,No,Cybersecurity Analyst,B.Tech Cyber Security
+93,93,49,59,83,7.65,6,7,9,9,3,2,1,1,10,10,8,9,9,2,5,Engineering,Remote,Yes,Mechanical Engineer,B.Tech Mechanical
+85,51,54,79,93,7.14,9,8,2,3,6,1,9,8,9,2,8,2,5,2,4,Technology,Team,No,AI Engineer,B.Tech AI
+60,71,91,84,79,7.78,5,10,3,10,10,6,6,7,3,1,6,4,10,9,9,Medicine,Research,No,Doctor,MBBS
+75,46,51,81,78,9.58,2,5,3,9,4,7,2,10,9,9,1,10,10,7,10,Education,Remote,Yes,Teacher,B.Ed
+81,89,49,63,65,9.79,4,10,5,3,8,10,9,7,8,6,9,1,4,10,10,Education,Independent,Yes,Teacher,B.Ed
+90,80,100,62,42,8.53,4,10,4,2,5,6,4,1,4,9,6,7,8,8,1,Engineering,Research,Yes,Civil Engineer,B.Tech Civil
+86,74,74,76,51,6.92,7,7,6,10,2,9,5,7,4,9,9,6,6,8,8,Engineering,Remote,Yes,Civil Engineer,B.Tech Civil
+57,53,49,51,76,6.64,6,10,2,4,7,8,10,8,10,8,4,10,3,7,1,Law,Remote,Yes,Lawyer,LLB
+88,76,49,43,50,8.9,8,8,9,7,7,10,1,5,2,4,9,10,8,8,3,Technology,Research,Yes,Software Engineer,B.Tech CSE
+78,77,44,54,64,9.61,7,3,2,1,4,7,9,6,10,10,2,3,8,10,7,Education,Remote,Yes,Teacher,B.Ed
+83,100,89,83,81,8.39,10,8,7,6,8,9,7,4,8,7,7,10,10,2,7,Technology,Remote,Yes,Software Engineer,B.Tech CSE
+83,52,40,85,87,9.02,10,9,9,2,9,1,7,4,6,7,9,2,3,7,10,Technology,Field Work,No,Cybersecurity Analyst,B.Tech Cyber Security
+95,80,70,51,63,8.79,9,10,8,5,5,10,6,7,3,2,10,8,3,2,4,Engineering,Team,No,Mechanical Engineer,B.Tech Mechanical
+97,80,40,91,45,6.04,7,8,10,7,9,2,5,4,6,2,10,1,7,7,10,Technology,Remote,No,AI Engineer,B.Tech AI
+52,42,90,78,72,8.81,9,4,10,3,1,6,4,1,10,10,5,7,6,7,7,Design,Team,Yes,Graphic Designer,B.Des
+87,72,93,75,98,7.36,10,8,6,5,4,10,4,8,7,10,10,5,3,7,9,Engineering,Team,Yes,Mechanical Engineer,B.Tech Mechanical
+82,90,74,92,90,9.2,10,7,8,7,10,8,4,6,8,8,7,1,8,2,5,Engineering,Field Work,Yes,Mechanical Engineer,B.Tech Mechanical
+73,74,40,84,93,8.94,5,4,5,2,7,8,9,7,8,8,6,6,4,10,5,Business,Research,Yes,Business Analyst,BBA
+54,52,97,98,93,9.94,10,6,3,2,2,2,8,10,1,9,1,8,10,7,9,Medicine,Remote,No,Doctor,MBBS
+65,54,88,76,48,8.32,1,9,7,8,9,7,9,6,8,8,8,2,9,8,6,Design,Research,Yes,Graphic Designer,B.Des
+79,95,56,51,75,9.92,5,4,5,8,10,10,7,10,8,7,4,7,6,6,7,Business,Independent,No,Business Analyst,BBA
+83,57,91,55,75,6.24,7,10,4,3,7,8,1,3,7,8,7,9,9,6,8,Technology,Research,No,Data Scientist,B.Sc Data Science
+93,80,46,68,87,7.95,6,5,6,6,9,9,5,8,9,7,2,6,10,4,10,Education,Field Work,Yes,Teacher,B.Ed
+94,79,58,69,80,8.99,10,9,6,7,8,10,7,2,2,3,10,4,6,6,5,Technology,Remote,No,Data Scientist,B.Sc Data Science
+66,50,51,94,41,8.62,3,4,5,2,4,7,7,8,8,2,8,9,1,1,6,Education,Field Work,Yes,Teacher,B.Ed
+54,55,87,58,68,8.52,3,3,9,3,1,10,6,6,8,10,9,5,9,8,3,Design,Remote,Yes,Graphic Designer,B.Des
+86,80,80,74,59,9.79,9,10,9,4,9,8,5,6,7,5,7,5,1,1,9,Technology,Field Work,Yes,Cybersecurity Analyst,B.Tech Cyber Security

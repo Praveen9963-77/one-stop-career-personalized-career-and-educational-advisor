@@ -1,9 +1,20 @@
 import axios from "axios";
 import express from "express";
+import multer from "multer";
+import pdfParse from "pdf-parse";
+import { createWorker } from "tesseract.js";
 import { requireAuth } from "../middleware/auth.js";
 import ResumeAnalysis from "../models/ResumeAnalysis.js";
 
 const router = express.Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const allowed = ["application/pdf", "image/png", "image/jpeg", "image/jpg", "image/webp"];
+    cb(allowed.includes(file.mimetype) ? null : new Error("Only PDF or image resumes are supported"), allowed.includes(file.mimetype));
+  }
+});
 
 function fallbackResumeAnalysis(resumeText) {
   const text = resumeText.toLowerCase();
@@ -21,13 +32,7 @@ function fallbackResumeAnalysis(resumeText) {
   };
 }
 
-router.post("/analyze", requireAuth, async (req, res) => {
-  const resumeText = String(req.body.resumeText || "").trim();
-
-  if (resumeText.length < 80) {
-    return res.status(400).json({ message: "Paste at least 80 characters of resume content" });
-  }
-
+async function analyzeAndSave(userId, resumeText) {
   let analysis;
   try {
     const ml = await axios.post(`${process.env.ML_SERVICE_URL}/analyze-resume`, { resumeText }, { timeout: 7000 });
@@ -37,12 +42,56 @@ router.post("/analyze", requireAuth, async (req, res) => {
   }
 
   const saved = await ResumeAnalysis.create({
-    user: req.user.id,
+    user: userId,
     resumeText,
     analysis
   });
 
+  return saved;
+}
+
+async function extractTextFromFile(file) {
+  if (file.mimetype === "application/pdf") {
+    const parsed = await pdfParse(file.buffer);
+    return parsed.text || "";
+  }
+
+  if (file.mimetype.startsWith("image/")) {
+    const worker = await createWorker("eng");
+    try {
+      const { data } = await worker.recognize(file.buffer);
+      return data.text || "";
+    } finally {
+      await worker.terminate();
+    }
+  }
+
+  return "";
+}
+
+router.post("/analyze", requireAuth, async (req, res) => {
+  const resumeText = String(req.body.resumeText || "").trim();
+
+  if (resumeText.length < 80) {
+    return res.status(400).json({ message: "Paste at least 80 characters of resume content" });
+  }
+
+  const saved = await analyzeAndSave(req.user.id, resumeText);
   res.status(201).json({ analysis: saved });
+});
+
+router.post("/analyze-file", requireAuth, upload.single("resume"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "Upload a PDF or image resume" });
+  }
+
+  const resumeText = (await extractTextFromFile(req.file)).trim();
+  if (resumeText.length < 80) {
+    return res.status(400).json({ message: "Could not extract enough text from the uploaded resume" });
+  }
+
+  const saved = await analyzeAndSave(req.user.id, resumeText);
+  res.status(201).json({ analysis: saved, extractedTextLength: resumeText.length });
 });
 
 router.get("/analyses", requireAuth, async (req, res) => {
@@ -51,4 +100,3 @@ router.get("/analyses", requireAuth, async (req, res) => {
 });
 
 export default router;
-

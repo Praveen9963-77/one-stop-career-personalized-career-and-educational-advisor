@@ -1,18 +1,42 @@
 import json
+import pickle
 from pathlib import Path
 from flask import Flask, jsonify, request
+import pandas as pd
 
-try:
-    from train_model import MODEL_PATH, train
-except ImportError:
-    from .train_model import MODEL_PATH, train
+BASE_DIR = Path(__file__).resolve().parent
+JSON_MODEL_PATH = BASE_DIR / "model" / "career_model.json"
+PICKLE_MODEL_PATHS = [
+    BASE_DIR / "career_model.pkl",
+    BASE_DIR.parent / "career_model.pkl",
+]
 
 app = Flask(__name__)
 
-if not MODEL_PATH.exists():
-    train()
+MODEL = None
+PICKLE_MODEL = None
+PICKLE_ARTIFACT = None
+MODEL_LOAD_ERROR = None
 
-MODEL = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
+for model_path in PICKLE_MODEL_PATHS:
+    if model_path.exists():
+        try:
+            with model_path.open("rb") as file:
+                loaded = pickle.load(file)
+                if isinstance(loaded, dict) and "model" in loaded:
+                    PICKLE_ARTIFACT = loaded
+                    PICKLE_MODEL = loaded["model"]
+                else:
+                    PICKLE_MODEL = loaded
+            break
+        except Exception as error:
+            MODEL_LOAD_ERROR = str(error)
+
+if PICKLE_MODEL is None and JSON_MODEL_PATH.exists():
+    try:
+        MODEL = json.loads(JSON_MODEL_PATH.read_text(encoding="utf-8"))
+    except Exception as error:
+        MODEL_LOAD_ERROR = str(error)
 
 SKILL_TAXONOMY = {
     "Software Developer": {"javascript", "python", "react", "node", "mongodb", "sql", "git", "api", "html", "css"},
@@ -31,15 +55,170 @@ STOP_WORDS = {
     "work", "project", "projects", "using", "into", "about", "also", "will", "can", "our", "their", "team",
 }
 
+TREE_FEATURES = [
+    "Math_Score",
+    "Physics_Score",
+    "Chemistry_Score",
+    "Biology_Score",
+    "English_Score",
+    "GPA",
+    "Coding_Skill",
+    "Problem_Solving",
+    "Data_Analysis",
+    "Web_Development",
+    "AI_Interest",
+    "Communication",
+    "Leadership",
+    "Teamwork",
+    "Public_Speaking",
+    "Creativity",
+    "Analytical_Thinking",
+    "Attention_To_Detail",
+    "Stress_Handling",
+    "Research_Interest",
+    "Social_Service_Interest",
+]
+
+
+def guidance_for(career):
+    if career in SKILL_TAXONOMY:
+        skills = sorted(SKILL_TAXONOMY[career])[:4]
+    else:
+        skills = ["communication", "problem solving", "portfolio projects", "digital literacy"]
+    return {
+        "educationPath": ["Build fundamentals", "Complete guided projects", "Create portfolio proof"],
+        "skillsToBuild": [skill.title() for skill in skills],
+    }
+
+
+def scale_score(scores, key, fallback=3):
+    return float(scores.get(key, fallback))
+
+
+def direct_feature_input(features):
+    return pd.DataFrame([[float(features.get(feature, 0)) for feature in TREE_FEATURES]], columns=TREE_FEATURES)
+
+
+def mapped_feature_input(scores):
+    technical = scale_score(scores, "technical")
+    analytical = scale_score(scores, "analytical")
+    creativity = scale_score(scores, "creativity")
+    communication = scale_score(scores, "communication")
+    social = scale_score(scores, "social")
+    business = scale_score(scores, "business")
+    health = scale_score(scores, "health_interest")
+    problem = scale_score(scores, "problem_solving")
+    academic = scale_score(scores, "academic_score")
+
+    def mark(value):
+        return round(value * 20, 2)
+
+    def ten(value):
+        return round(value * 2, 2)
+
+    values = [
+        mark(analytical),
+        mark(technical),
+        mark(health),
+        mark(health),
+        mark(communication),
+        round(academic * 2, 2),
+        ten(technical),
+        ten(problem),
+        ten(analytical),
+        ten(technical),
+        ten(technical),
+        ten(communication),
+        ten(business),
+        ten(social),
+        ten(communication),
+        ten(creativity),
+        ten(analytical),
+        ten(problem),
+        ten(problem),
+        ten(analytical),
+        ten(social),
+    ]
+    return pd.DataFrame([values], columns=TREE_FEATURES)
+
 
 def distance(a, b):
+    if MODEL is None:
+        return 0
     total = 0
     for index, feature in enumerate(MODEL["features"]):
         total += (float(a.get(feature, 3)) - float(b[index])) ** 2
     return total ** 0.5
 
 
-def predict(scores):
+def class_names():
+    if PICKLE_ARTIFACT and "encoder" in PICKLE_ARTIFACT:
+        return list(PICKLE_ARTIFACT["encoder"].classes_)
+    return list(getattr(PICKLE_MODEL, "classes_", []))
+
+
+def predict(payload):
+    if PICKLE_MODEL is not None:
+        try:
+            input_row = direct_feature_input(payload["features"]) if "features" in payload else mapped_feature_input(payload.get("scores", {}))
+            raw_prediction = PICKLE_MODEL.predict(input_row)[0]
+            names = class_names()
+            if PICKLE_ARTIFACT and "encoder" in PICKLE_ARTIFACT:
+                career = str(PICKLE_ARTIFACT["encoder"].inverse_transform([raw_prediction])[0])
+            elif isinstance(raw_prediction, int) and names:
+                career = str(names[raw_prediction])
+            else:
+                career = str(raw_prediction)
+
+            alternatives = []
+            confidence = 0.82
+            if hasattr(PICKLE_MODEL, "predict_proba"):
+                probabilities = PICKLE_MODEL.predict_proba(input_row)[0]
+                ranked = sorted(enumerate(probabilities), key=lambda item: item[1], reverse=True)
+                alternatives = [
+                    {"career": str(names[index]), "score": round(float(probability), 4)}
+                    for index, probability in ranked[1:4]
+                    if index < len(names)
+                ]
+                confidence = round(float(ranked[0][1]), 4)
+        except Exception as error:
+            return {
+                "career": "Software Developer",
+                "confidence": 0.55,
+                "educationPath": ["Fix ML model input mapping", "Retrain model", "Run prediction again"],
+                "skillsToBuild": ["Problem Solving", "Python", "Model Debugging"],
+                "explanation": f"Random Forest model loaded, but prediction failed: {error}",
+                "alternatives": [],
+                "model": "random_forest_error",
+                "dataset": "training.csv",
+            }
+        guidance = guidance_for(career)
+        score_source = payload.get("features") or payload.get("scores", {})
+        top_features = sorted(score_source.items(), key=lambda item: float(item[1]), reverse=True)[:3]
+        strengths = ", ".join(feature.replace("_", " ") for feature, _ in top_features)
+        return {
+            "career": career,
+            "confidence": confidence,
+            "educationPath": guidance["educationPath"],
+            "skillsToBuild": guidance["skillsToBuild"],
+            "explanation": f"Random Forest predicted this career from your strongest profile signals: {strengths}.",
+            "alternatives": alternatives,
+            "model": "random_forest",
+            "dataset": "training.csv",
+        }
+
+    if MODEL is None:
+        return {
+            "career": "Software Developer",
+            "confidence": 0.6,
+            "educationPath": ["Build fundamentals", "Complete projects", "Prepare portfolio"],
+            "skillsToBuild": ["Problem Solving", "Communication", "Digital Literacy"],
+            "explanation": f"No usable ML model file was found, so a safe fallback recommendation was used. {MODEL_LOAD_ERROR or ''}".strip(),
+            "alternatives": [],
+            "model": "fallback",
+            "dataset": "none",
+        }
+
     neighbors = []
     for sample in MODEL.get("samples", []):
         dist = distance(scores, sample["vector"])
@@ -121,6 +300,25 @@ def analyze_resume_text(resume_text):
 
 @app.get("/health")
 def health():
+    if PICKLE_MODEL is not None:
+        return jsonify({
+            "status": "ok",
+            "model": PICKLE_ARTIFACT.get("model_type", "random_forest") if PICKLE_ARTIFACT else "pickle_model",
+            "dataset": PICKLE_ARTIFACT.get("dataset", "training.csv") if PICKLE_ARTIFACT else "training.csv",
+            "accuracy": PICKLE_ARTIFACT.get("accuracy") if PICKLE_ARTIFACT else None,
+            "features": TREE_FEATURES,
+            "modelClasses": len(class_names())
+        })
+
+    if MODEL is None:
+        return jsonify({
+            "status": "degraded",
+            "model": "fallback",
+            "dataset": "none",
+            "modelClasses": 0,
+            "error": MODEL_LOAD_ERROR
+        })
+
     return jsonify({
         "status": "ok",
         "model": MODEL.get("modelType", "knn"),
@@ -133,8 +331,7 @@ def health():
 @app.post("/predict")
 def recommend():
     body = request.get_json(silent=True) or {}
-    scores = body.get("scores", {})
-    return jsonify(predict(scores))
+    return jsonify(predict(body))
 
 
 @app.post("/analyze-resume")

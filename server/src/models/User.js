@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String, sparse: true },
     githubId: { type: String, sparse: true },
     avatarUrl: String,
-    authProviders: [{ type: String, enum: ["password", "google", "github"] }]
+    authProviders: [{ type: String, enum: ["password", "google"] }]
   },
   { timestamps: true }
 );

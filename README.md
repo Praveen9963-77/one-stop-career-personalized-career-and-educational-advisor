@@ -28,7 +28,13 @@ npm run train:model
 cp server/.env.example server/.env
 ```
 
-4. Start all services:
+4. Configure the OpenAI API key for the Career Chat feature:
+
+   - Get your OpenAI API key from [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+   - Open `server/.env` and replace `OPENAI_API_KEY=your-openai-api-key-here` with your actual key
+   - **Note:** Without this key, the Career Chat feature will return an error
+
+5. Start all services:
 
 ```bash
 npm run dev
@@ -37,8 +43,10 @@ npm run dev
 Services:
 
 - React app: `http://localhost:5173`
-- Express API: `http://localhost:5001`
+- Express API: `http://localhost:5001` (should be running on PORT 5000 per .env, see note below)
 - Python ML/NLP API: `http://localhost:8000`
+
+**Note:** The PORT in `.env` is set to 5000, but the README mentions 5001. Update `PORT=5001` in `server/.env` if needed to match your setup.
 
 ## Core Flow
 

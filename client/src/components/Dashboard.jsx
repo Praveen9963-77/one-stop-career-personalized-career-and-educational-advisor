@@ -15,6 +15,7 @@ import {
   LogOut,
   Map,
   Medal,
+  MessageSquare,
   Menu,
   Search,
   SlidersHorizontal,
@@ -23,18 +24,16 @@ import {
   Trophy,
   UserRound
 } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api";
 import ResumePanel from "./ResumePanel";
 import ResultPanel from "./ResultPanel";
-import TestPanel from "./TestPanel";
 const sidebarFeatures = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "career-profile", label: "Career Profiling", icon: Target },
   { id: "manual-profile", label: "Manual Skills", icon: SlidersHorizontal },
   { id: "guidance", label: "Guidance", icon: Compass },
-  { id: "aptitude", label: "Aptitude Test", icon: ListChecks },
-  { id: "coding", label: "Coding Test", icon: Code2 },
+  { id: "chat", label: "Career Chat", icon: MessageSquare },
   { id: "skills", label: "Input Skills", icon: BrainCircuit },
   { id: "resume", label: "Resume NLP", icon: FileText },
   { id: "jobs", label: "Job Finder", icon: BriefcaseBusiness },
@@ -46,17 +45,26 @@ const sidebarFeatures = [
 ];
 
 const jobMatches = [
-  { role: "Frontend Developer Intern", fit: "87%", skills: "React, JavaScript, UI basics" },
-  { role: "Data Analyst Trainee", fit: "78%", skills: "Excel, SQL, Python" },
-  { role: "Business Analyst Intern", fit: "74%", skills: "Communication, process, dashboards" }
+  { role: "Frontend Developer Intern", company: "TCS", location: "Bengaluru", fit: "87%", salary: "3-5 LPA", type: "Internship", skills: "React, JavaScript, CSS" },
+  { role: "Data Analyst Trainee", company: "Infosys", location: "Hyderabad", fit: "82%", salary: "4-6 LPA", type: "Entry level", skills: "Excel, SQL, Python" },
+  { role: "Business Analyst Intern", company: "Deloitte", location: "Remote", fit: "78%", salary: "3-5 LPA", type: "Internship", skills: "Communication, process mapping, dashboards" },
+  { role: "UX Designer", company: "Accenture", location: "Pune", fit: "81%", salary: "4-6 LPA", type: "Entry level", skills: "Figma, prototyping, user research" },
+  { role: "Full-Stack Developer", company: "Cognizant", location: "Chennai", fit: "79%", salary: "5-8 LPA", type: "Entry level", skills: "React, Node.js, MongoDB" },
+  { role: "Machine Learning Engineer", company: "IBM", location: "Bengaluru", fit: "76%", salary: "8-12 LPA", type: "Mid level", skills: "Python, ML, TensorFlow" },
+  { role: "Product Analyst", company: "Flipkart", location: "Bengaluru", fit: "80%", salary: "6-9 LPA", type: "Entry level", skills: "SQL, analytics, stakeholder communication" },
+  { role: "Cybersecurity Analyst", company: "Wipro", location: "Mumbai", fit: "75%", salary: "5-7 LPA", type: "Entry level", skills: "Network security, incident response, risk assessment" },
+  { role: "DevOps Engineer", company: "Dell", location: "Bengaluru", fit: "74%", salary: "7-10 LPA", type: "Mid level", skills: "CI/CD, Docker, Kubernetes" },
+  { role: "Digital Marketing Executive", company: "Zoho", location: "Chennai", fit: "72%", salary: "3-5 LPA", type: "Entry level", skills: "SEO, social media, analytics" },
+  { role: "QA Automation Tester", company: "HCL", location: "Noida", fit: "77%", salary: "4-6 LPA", type: "Entry level", skills: "Selenium, test automation, Java" },
+  { role: "Data Science Intern", company: "Byju's", location: "Bengaluru", fit: "83%", salary: "3-4 LPA", type: "Internship", skills: "Python, machine learning, data visualization" }
 ];
 
 const profileFeatureFields = [
-  ["Math_Score", "Math Score", 0, 100],
-  ["Physics_Score", "Physics Score", 0, 100],
-  ["Chemistry_Score", "Chemistry Score", 0, 100],
-  ["Biology_Score", "Biology Score", 0, 100],
-  ["English_Score", "English Score", 0, 100],
+  ["Math_Interest", "Math Interest", 1, 10],
+  ["Physics_Interest", "Physics Interest", 1, 10],
+  ["Chemistry_Interest", "Chemistry Interest", 1, 10],
+  ["Biology_Interest", "Biology Interest", 1, 10],
+  ["English_Interest", "English Interest", 1, 10],
   ["GPA", "GPA", 0, 10],
   ["Coding_Skill", "Coding Skill", 1, 10],
   ["Problem_Solving", "Problem Solving", 1, 10],
@@ -88,13 +96,91 @@ const ratingChoices = [
   ["Expert", 10]
 ];
 
-const academicFeatureKeys = new Set(["Math_Score", "Physics_Score", "Chemistry_Score", "Biology_Score", "English_Score", "GPA"]);
+function shuffleArray(items) {
+  const array = [...items];
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+const CAREER_LEARNING_PLANS = {
+  "Software Engineer": {
+    resources: [
+      { title: "React Full Course for Beginners", videoId: "w7ejDZ8SWv8", url: "https://www.youtube.com/watch?v=w7ejDZ8SWv8", description: "End-to-end React app development tutorial." },
+      { title: "Python for Everybody", videoId: "8DvywoWv6fI", url: "https://www.youtube.com/watch?v=8DvywoWv6fI", description: "Complete Python beginner course." },
+      { title: "Git & GitHub Crash Course", videoId: "RGOj5yH7evk", url: "https://www.youtube.com/watch?v=RGOj5yH7evk", description: "Version control basics for developers." }
+    ],
+    certifications: [
+      { title: "freeCodeCamp Responsive Web Design", url: "https://www.freecodecamp.org/learn/" },
+      { title: "Google IT Support Professional", url: "https://grow.google/programs/it-support/" }
+    ]
+  },
+  "Data Scientist": {
+    resources: [
+      { title: "Data Science Full Course", videoId: "ua-CiDNNj30", url: "https://www.youtube.com/watch?v=ua-CiDNNj30", description: "Python, statistics, and ML workflow." },
+      { title: "Machine Learning Tutorial", videoId: "Gv9_4yMHFhI", url: "https://www.youtube.com/watch?v=Gv9_4yMHFhI", description: "Complete machine learning crash course." },
+      { title: "SQL Tutorial", videoId: "HXV3zeQKqGY", url: "https://www.youtube.com/watch?v=HXV3zeQKqGY", description: "SQL querying for beginners." }
+    ],
+    certifications: [
+      { title: "Google Data Analytics Professional", url: "https://grow.google/data-analytics/" },
+      { title: "IBM Data Science Professional", url: "https://www.coursera.org/professional-certificates/ibm-data-science" }
+    ]
+  },
+  "AI Engineer": {
+    resources: [
+      { title: "Deep Learning Full Course", videoId: "tPYj3fFJGjk", url: "https://www.youtube.com/watch?v=tPYj3fFJGjk", description: "Neural networks and TensorFlow basics." },
+      { title: "TensorFlow Tutorial", videoId: "z_8bCaM4F2c", url: "https://www.youtube.com/watch?v=z_8bCaM4F2c", description: "Build models with TensorFlow." },
+      { title: "NLP Crash Course", videoId: "bR7Y8YtFSb0", url: "https://www.youtube.com/watch?v=bR7Y8YtFSb0", description: "Natural language processing introduction." }
+    ],
+    certifications: [
+      { title: "Google Machine Learning", url: "https://cloud.google.com/training/machinelearning-ai" },
+      { title: "IBM AI Engineering Professional", url: "https://www.coursera.org/professional-certificates/ai-engineer" }
+    ]
+  },
+  "Web Developer": {
+    resources: [
+      { title: "HTML, CSS & JavaScript Course", videoId: "qz0aGYrrlhU", url: "https://www.youtube.com/watch?v=qz0aGYrrlhU", description: "Build modern websites from scratch." },
+      { title: "React JS Crash Course", videoId: "w7ejDZ8SWv8", url: "https://www.youtube.com/watch?v=w7ejDZ8SWv8", description: "React fundamentals and project building." },
+      { title: "Frontend Developer Roadmap", videoId: "nB8P8w8L4Iw", url: "https://www.youtube.com/watch?v=nB8P8w8L4Iw", description: "Frontend career path guidance." }
+    ],
+    certifications: [
+      { title: "freeCodeCamp Front End Libraries", url: "https://www.freecodecamp.org/learn/" },
+      { title: "Microsoft Certified: Power Platform App Maker", url: "https://learn.microsoft.com/en-us/certifications/power-platform-app-maker/" }
+    ]
+  },
+  "Business Analyst": {
+    resources: [
+      { title: "Business Analysis Tutorial", videoId: "9B7mqO6CBWc", url: "https://www.youtube.com/watch?v=9B7mqO6CBWc", description: "Requirements gathering and documentation." },
+      { title: "Excel for Business Analysts", videoId: "8vAJXHjq4CI", url: "https://www.youtube.com/watch?v=8vAJXHjq4CI", description: "Excel tools for analysis." },
+      { title: "SQL for Analysts", videoId: "7S_tz1z_5bA", url: "https://www.youtube.com/watch?v=7S_tz1z_5bA", description: "Querying databases for reporting." }
+    ],
+    certifications: [
+      { title: "Google Data Analytics Professional", url: "https://grow.google/data-analytics/" },
+      { title: "Certified Business Analyst Professional", url: "https://www.iiba.org/certification/" }
+    ]
+  },
+  "Healthcare / Biology Track": {
+    resources: [
+      { title: "Biology Basics", videoId: "2JTpIr8yDiI", url: "https://www.youtube.com/watch?v=2JTpIr8yDiI", description: "Core biology concepts for career readiness." },
+      { title: "Medical Research Methods", videoId: "M8Cf3owWg7w", url: "https://www.youtube.com/watch?v=M8Cf3owWg7w", description: "Research skills for healthcare careers." },
+      { title: "Communication for Healthcare", videoId: "EfqXxN-8ON4", url: "https://www.youtube.com/watch?v=EfqXxN-8ON4", description: "Patient communication fundamentals." }
+    ],
+    certifications: [
+      { title: "Coursera Medical Research", url: "https://www.coursera.org/" },
+      { title: "LinkedIn Learning Healthcare", url: "https://www.linkedin.com/learning/" }
+    ]
+  }
+};
+
+const academicFeatureKeys = new Set(["GPA"]);
 
 const featureSections = [
   {
-    title: "Academic Scores",
-    helper: "Use your latest completed academic level. Enter subject marks out of 100 and GPA out of 10.",
-    keys: ["Math_Score", "Physics_Score", "Chemistry_Score", "Biology_Score", "English_Score", "GPA"]
+    title: "Subject Interests",
+    helper: "Rate your interest in each subject on a scale of 1-10.",
+    keys: ["Math_Interest", "Physics_Interest", "Chemistry_Interest", "Biology_Interest", "English_Interest"]
   },
   {
     title: "Technical Skills",
@@ -114,19 +200,19 @@ const featureSections = [
 ];
 
 const profilingQuestions = [
-  { id: "math_1", feature: "Math_Score", question: "If 25% of a number is 40, what is the number?", options: [["100", 40], ["120", 55], ["160", 100], ["200", 45]] },
-  { id: "math_2", feature: "Math_Score", question: "The average of 8, 12, 15 and 25 is:", options: [["12", 45], ["15", 55], ["18", 100], ["20", 50]] },
-  { id: "math_3", feature: "Math_Score", question: "If x + 7 = 19, then x is:", options: [["10", 50], ["11", 55], ["12", 100], ["13", 50]] },
-  { id: "math_4", feature: "Math_Score", question: "A ratio 2:3 has total 50. The larger part is:", options: [["20", 55], ["25", 50], ["30", 100], ["35", 45]] },
-  { id: "physics_1", feature: "Physics_Score", question: "The SI unit of force is:", options: [["Joule", 45], ["Newton", 100], ["Watt", 45], ["Pascal", 55]] },
-  { id: "physics_2", feature: "Physics_Score", question: "Speed is calculated as:", options: [["Distance / Time", 100], ["Time / Distance", 40], ["Mass x Acceleration", 55], ["Force / Area", 45]] },
-  { id: "physics_3", feature: "Physics_Score", question: "A simple electric circuit must have:", options: [["Only a bulb", 40], ["Only a wire", 40], ["Closed path and source", 100], ["Only a switch", 45]] },
-  { id: "chemistry_1", feature: "Chemistry_Score", question: "Water is represented by the formula:", options: [["CO2", 40], ["H2O", 100], ["O2", 45], ["NaCl", 40]] },
-  { id: "chemistry_2", feature: "Chemistry_Score", question: "A pH less than 7 usually indicates:", options: [["Acid", 100], ["Base", 40], ["Salt only", 45], ["Metal", 40]] },
-  { id: "biology_1", feature: "Biology_Score", question: "The basic unit of life is:", options: [["Atom", 40], ["Cell", 100], ["Tissue only", 55], ["Organ", 60]] },
-  { id: "biology_2", feature: "Biology_Score", question: "Which system transports blood in the body?", options: [["Digestive", 45], ["Circulatory", 100], ["Respiratory only", 55], ["Nervous", 50]] },
-  { id: "english_1", feature: "English_Score", question: "Choose the correctly spelled word:", options: [["Recieve", 40], ["Receive", 100], ["Receeve", 40], ["Receve", 40]] },
-  { id: "english_2", feature: "English_Score", question: "Choose the best synonym for concise:", options: [["Lengthy", 40], ["Brief", 100], ["Confused", 45], ["Delayed", 40]] },
+  { id: "math_1", feature: "Math_Interest", question: "If 25% of a number is 40, what is the number?", options: [["100", 40], ["120", 55], ["160", 100], ["200", 45]] },
+  { id: "math_2", feature: "Math_Interest", question: "The average of 8, 12, 15 and 25 is:", options: [["12", 45], ["15", 55], ["18", 100], ["20", 50]] },
+  { id: "math_3", feature: "Math_Interest", question: "If x + 7 = 19, then x is:", options: [["10", 50], ["11", 55], ["12", 100], ["13", 50]] },
+  { id: "math_4", feature: "Math_Interest", question: "A ratio 2:3 has total 50. The larger part is:", options: [["20", 55], ["25", 50], ["30", 100], ["35", 45]] },
+  { id: "physics_1", feature: "Physics_Interest", question: "The SI unit of force is:", options: [["Joule", 45], ["Newton", 100], ["Watt", 45], ["Pascal", 55]] },
+  { id: "physics_2", feature: "Physics_Interest", question: "Speed is calculated as:", options: [["Distance / Time", 100], ["Time / Distance", 40], ["Mass x Acceleration", 55], ["Force / Area", 45]] },
+  { id: "physics_3", feature: "Physics_Interest", question: "A simple electric circuit must have:", options: [["Only a bulb", 40], ["Only a wire", 40], ["Closed path and source", 100], ["Only a switch", 45]] },
+  { id: "chemistry_1", feature: "Chemistry_Interest", question: "Water is represented by the formula:", options: [["CO2", 40], ["H2O", 100], ["O2", 45], ["NaCl", 40]] },
+  { id: "chemistry_2", feature: "Chemistry_Interest", question: "A pH less than 7 usually indicates:", options: [["Acid", 100], ["Base", 40], ["Salt only", 45], ["Metal", 40]] },
+  { id: "biology_1", feature: "Biology_Interest", question: "The basic unit of life is:", options: [["Atom", 40], ["Cell", 100], ["Tissue only", 55], ["Organ", 60]] },
+  { id: "biology_2", feature: "Biology_Interest", question: "Which system transports blood in the body?", options: [["Digestive", 45], ["Circulatory", 100], ["Respiratory only", 55], ["Nervous", 50]] },
+  { id: "english_1", feature: "English_Interest", question: "Choose the correctly spelled word:", options: [["Recieve", 40], ["Receive", 100], ["Receeve", 40], ["Receve", 40]] },
+  { id: "english_2", feature: "English_Interest", question: "Choose the best synonym for concise:", options: [["Lengthy", 40], ["Brief", 100], ["Confused", 45], ["Delayed", 40]] },
   { id: "coding_1", feature: "Coding_Skill", question: "Which data structure follows FIFO?", options: [["Stack", 3], ["Queue", 10], ["Tree", 5], ["Graph", 5]] },
   { id: "coding_2", feature: "Coding_Skill", question: "In programming, a loop is mainly used to:", options: [["Repeat instructions", 10], ["Store images", 3], ["Delete variables", 2], ["Compile hardware", 2]] },
   { id: "coding_3", feature: "Coding_Skill", question: "Which symbol is commonly used for strict equality in JavaScript?", options: [["=", 2], ["==", 5], ["===", 10], ["!=", 3]] },
@@ -153,16 +239,16 @@ const profilingQuestions = [
   { id: "stress_1", feature: "Stress_Handling", question: "When a deadline is close, the best response is:", options: [["Prioritize tasks calmly", 10], ["Panic and stop", 1], ["Blame others", 2], ["Ignore deadline", 1]] },
   { id: "research_1", feature: "Research_Interest", question: "A good research habit is to:", options: [["Compare credible sources", 10], ["Use one random source", 2], ["Avoid reading", 1], ["Never cite", 1]] },
   { id: "social_1", feature: "Social_Service_Interest", question: "A career focused on public impact requires:", options: [["Empathy and service mindset", 10], ["Ignoring people", 1], ["No ethics", 1], ["Avoiding communication", 2]] },
-  { id: "math_5", feature: "Math_Score", question: "A shopkeeper gives 20% discount on an item marked at 2500. Selling price is:", options: [["1800", 55], ["2000", 100], ["2100", 50], ["2300", 40]] },
-  { id: "math_6", feature: "Math_Score", question: "If the probability of an event is 0.25, the probability that it does not occur is:", options: [["0.25", 45], ["0.50", 50], ["0.75", 100], ["1.25", 35]] },
-  { id: "physics_4", feature: "Physics_Score", question: "According to Ohm's law, if voltage doubles and resistance stays same, current:", options: [["Halves", 45], ["Doubles", 100], ["Becomes zero", 35], ["Stays same", 50]] },
-  { id: "physics_5", feature: "Physics_Score", question: "A body moving with constant velocity has acceleration:", options: [["Zero", 100], ["Increasing", 40], ["Negative always", 45], ["Equal to speed", 35]] },
-  { id: "chemistry_3", feature: "Chemistry_Score", question: "Which bond involves sharing of electron pairs?", options: [["Ionic bond", 55], ["Covalent bond", 100], ["Metallic sound", 35], ["Gravity bond", 30]] },
-  { id: "chemistry_4", feature: "Chemistry_Score", question: "Oxidation generally means:", options: [["Gain of electrons", 45], ["Loss of electrons", 100], ["No electron change", 35], ["Only melting", 30]] },
-  { id: "biology_3", feature: "Biology_Score", question: "DNA mainly stores:", options: [["Genetic information", 100], ["Blood pressure only", 40], ["Oxygen only", 35], ["Digestive enzymes only", 45]] },
-  { id: "biology_4", feature: "Biology_Score", question: "Photosynthesis mainly converts light energy into:", options: [["Chemical energy", 100], ["Sound energy", 35], ["Mechanical energy", 40], ["Nuclear energy", 30]] },
-  { id: "english_3", feature: "English_Score", question: "Choose the sentence with correct grammar:", options: [["She go to college daily.", 35], ["She goes to college daily.", 100], ["She going college daily.", 40], ["She gone to college daily.", 45]] },
-  { id: "english_4", feature: "English_Score", question: "A paragraph conclusion should usually:", options: [["Introduce unrelated topic", 35], ["Summarize or close the idea", 100], ["Remove the main point", 35], ["Repeat random words", 30]] },
+  { id: "math_5", feature: "Math_Interest", question: "A shopkeeper gives 20% discount on an item marked at 2500. Selling price is:", options: [["1800", 55], ["2000", 100], ["2100", 50], ["2300", 40]] },
+  { id: "math_6", feature: "Math_Interest", question: "If the probability of an event is 0.25, the probability that it does not occur is:", options: [["0.25", 45], ["0.50", 50], ["0.75", 100], ["1.25", 35]] },
+  { id: "physics_4", feature: "Physics_Interest", question: "According to Ohm's law, if voltage doubles and resistance stays same, current:", options: [["Halves", 45], ["Doubles", 100], ["Becomes zero", 35], ["Stays same", 50]] },
+  { id: "physics_5", feature: "Physics_Interest", question: "A body moving with constant velocity has acceleration:", options: [["Zero", 100], ["Increasing", 40], ["Negative always", 45], ["Equal to speed", 35]] },
+  { id: "chemistry_3", feature: "Chemistry_Interest", question: "Which bond involves sharing of electron pairs?", options: [["Ionic bond", 55], ["Covalent bond", 100], ["Metallic sound", 35], ["Gravity bond", 30]] },
+  { id: "chemistry_4", feature: "Chemistry_Interest", question: "Oxidation generally means:", options: [["Gain of electrons", 45], ["Loss of electrons", 100], ["No electron change", 35], ["Only melting", 30]] },
+  { id: "biology_3", feature: "Biology_Interest", question: "DNA mainly stores:", options: [["Genetic information", 100], ["Blood pressure only", 40], ["Oxygen only", 35], ["Digestive enzymes only", 45]] },
+  { id: "biology_4", feature: "Biology_Interest", question: "Photosynthesis mainly converts light energy into:", options: [["Chemical energy", 100], ["Sound energy", 35], ["Mechanical energy", 40], ["Nuclear energy", 30]] },
+  { id: "english_3", feature: "English_Interest", question: "Choose the sentence with correct grammar:", options: [["She go to college daily.", 35], ["She goes to college daily.", 100], ["She going college daily.", 40], ["She gone to college daily.", 45]] },
+  { id: "english_4", feature: "English_Interest", question: "A paragraph conclusion should usually:", options: [["Introduce unrelated topic", 35], ["Summarize or close the idea", 100], ["Remove the main point", 35], ["Repeat random words", 30]] },
   { id: "coding_4", feature: "Coding_Skill", question: "What is the time complexity of binary search on a sorted array?", options: [["O(n)", 50], ["O(log n)", 10], ["O(n²)", 35], ["O(1) always", 45]] },
   { id: "coding_5", feature: "Coding_Skill", question: "A function calling itself is known as:", options: [["Iteration only", 45], ["Recursion", 10], ["Compilation", 35], ["Indexing", 40]] },
   { id: "problem_4", feature: "Problem_Solving", question: "A system fails only for large inputs. Best likely issue to check first:", options: [["Color palette", 1], ["Algorithm efficiency or memory", 10], ["Button text", 2], ["Logo size", 1]] },
@@ -186,24 +272,46 @@ const profileFeatureLabels = Object.fromEntries(profileFeatureFields.map(([key, 
 
 const profilingSubjectGroups = [
   {
-    title: "Academics",
-    features: ["Math_Score", "Physics_Score", "Chemistry_Score", "Biology_Score", "English_Score"]
+    title: "Section 1: Aptitude & Logical Reasoning",
+    description: "Math ability, problem solving, and analytical thinking.",
+    features: ["Math_Interest", "Problem_Solving", "Analytical_Thinking"]
   },
   {
-    title: "Technical",
-    features: ["Coding_Skill", "Problem_Solving", "Data_Analysis", "Web_Development", "AI_Interest"]
+    title: "Section 2: Verbal & Communication",
+    description: "English, communication, public speaking, and teamwork signals.",
+    features: ["English_Interest", "Communication", "Public_Speaking", "Teamwork"]
   },
   {
-    title: "Communication",
-    features: ["Communication", "Leadership", "Teamwork", "Public_Speaking"]
+    title: "Section 3: Web & Coding Fundamentals",
+    description: "Coding basics, web development, detail focus, and practical debugging.",
+    features: ["Coding_Skill", "Web_Development", "Attention_To_Detail"]
   },
   {
-    title: "Thinking Style",
-    features: ["Creativity", "Analytical_Thinking", "Attention_To_Detail", "Stress_Handling", "Research_Interest", "Social_Service_Interest"]
+    title: "Section 4: AI, Data & Research",
+    description: "AI interest, data analysis, research orientation, and technical reasoning.",
+    features: ["AI_Interest", "Data_Analysis", "Research_Interest"]
+  },
+  {
+    title: "Section 5: Science & Work Style",
+    description: "Science knowledge, leadership, creativity, stress handling, and service mindset.",
+    features: ["Physics_Interest", "Chemistry_Interest", "Biology_Interest", "Leadership", "Creativity", "Stress_Handling", "Social_Service_Interest"]
   }
 ];
 
-function computeGuidedProfile(mcqAnswers, gpa) {
+function deriveAcademicScore(features) {
+  const interestKeys = ["Math_Interest", "Physics_Interest", "Chemistry_Interest", "Biology_Interest", "English_Interest"];
+  const average = interestKeys.reduce((sum, key) => sum + Number(features[key] || 0), 0) / interestKeys.length;
+  return Math.round(average * 10) / 10;
+}
+
+function normalizeProfileFeatures(features) {
+  return {
+    ...features,
+    GPA: deriveAcademicScore(features)
+  };
+}
+
+function computeGuidedProfile(mcqAnswers) {
   const totals = {};
   const counts = {};
 
@@ -214,12 +322,12 @@ function computeGuidedProfile(mcqAnswers, gpa) {
     counts[question.feature] = (counts[question.feature] || 0) + 1;
   }
 
-  const features = { ...defaultProfileFeatures, GPA: Number(gpa || 7) };
+  const features = { ...defaultProfileFeatures };
   for (const feature of Object.keys(totals)) {
     features[feature] = Math.round((totals[feature] / counts[feature]) * 100) / 100;
   }
 
-  return features;
+  return normalizeProfileFeatures(features);
 }
 
 function makeLocalRecommendation(features) {
@@ -229,19 +337,19 @@ function makeLocalRecommendation(features) {
   const careerRules = [
     {
       career: "Software Engineer",
-      score: profile.Coding_Skill + profile.Problem_Solving + profile.Web_Development + profile.Math_Score / 10,
+      score: profile.Coding_Skill + profile.Problem_Solving + profile.Web_Development + profile.Math_Interest,
       skills: ["Data Structures", "JavaScript or Python", "System Design", "Git"],
       path: ["DSA foundation", "Build full-stack projects", "Practice coding interviews"]
     },
     {
       career: "Data Scientist",
-      score: profile.Data_Analysis + profile.AI_Interest + profile.Analytical_Thinking + profile.Math_Score / 10,
+      score: profile.Data_Analysis + profile.AI_Interest + profile.Analytical_Thinking + profile.Math_Interest,
       skills: ["Python", "Statistics", "SQL", "Machine Learning"],
       path: ["Python analytics", "Statistics and SQL", "ML model projects"]
     },
     {
       career: "AI Engineer",
-      score: profile.AI_Interest + profile.Coding_Skill + profile.Research_Interest + profile.Math_Score / 10,
+      score: profile.AI_Interest + profile.Coding_Skill + profile.Research_Interest + profile.Math_Interest,
       skills: ["Python", "Machine Learning", "Deep Learning", "Model Evaluation"],
       path: ["ML basics", "Neural networks", "Deploy AI mini projects"]
     },
@@ -259,7 +367,7 @@ function makeLocalRecommendation(features) {
     },
     {
       career: "Healthcare / Biology Track",
-      score: profile.Biology_Score / 10 + profile.Chemistry_Score / 10 + profile.Social_Service_Interest + profile.Research_Interest,
+      score: profile.Biology_Interest + profile.Chemistry_Interest + profile.Social_Service_Interest + profile.Research_Interest,
       skills: ["Biology", "Research", "Communication", "Attention to Detail"],
       path: ["Biology fundamentals", "Healthcare entrance preparation", "Research projects"]
     }
@@ -274,11 +382,53 @@ function makeLocalRecommendation(features) {
     educationPath: top.path,
     skillsToBuild: top.skills,
     explanation: `This recommendation is based on your strongest scores in ${top.skills.slice(0, 3).join(", ")}.`,
+    learningResources: makeLearningResources(top.skills),
     alternatives: careerRules.slice(1, 4).map((item) => ({
       career: item.career,
       score: Math.min(0.9, Math.max(0.45, item.score / maxScore))
     }))
   };
+}
+
+function makeLearningResources(skills = []) {
+  const certifications = [
+    { title: "freeCodeCamp", url: "https://www.freecodecamp.org/learn/" },
+    { title: "Kaggle Learn", url: "https://www.kaggle.com/learn" },
+    { title: "Microsoft Learn", url: "https://learn.microsoft.com/training/" },
+    { title: "AWS Skill Builder", url: "https://skillbuilder.aws/" },
+    { title: "Google Skillshop", url: "https://skillshop.withgoogle.com/" },
+    { title: "Cisco Skills For All", url: "https://skillsforall.com/" },
+    { title: "IBM SkillsBuild", url: "https://skillsbuild.org/" }
+  ];
+
+  return [...new Set(skills.filter(Boolean))].slice(0, 8).map((skill) => ({
+    skill,
+    youtube: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${skill} full course for beginners`)}`,
+    certifications: certifications.slice(0, 3)
+  }));
+}
+
+function featuresFromSkillList(skills = []) {
+  const text = skills.join(" ").toLowerCase();
+  const hasAny = (words) => words.some((word) => text.includes(word));
+  const boosted = { ...defaultProfileFeatures };
+
+  boosted.Coding_Skill = hasAny(["javascript", "python", "java", "c++", "react", "node", "coding", "programming"]) ? 9 : 4;
+  boosted.Web_Development = hasAny(["html", "css", "react", "node", "express", "frontend", "backend", "mern", "web"]) ? 9 : 3;
+  boosted.Data_Analysis = hasAny(["sql", "excel", "power bi", "tableau", "data", "pandas", "analytics"]) ? 9 : 3;
+  boosted.AI_Interest = hasAny(["machine learning", "ml", "ai", "deep learning", "nlp", "tensorflow", "pytorch"]) ? 9 : 3;
+  boosted.Problem_Solving = hasAny(["dsa", "algorithm", "problem", "leetcode", "logic"]) ? 9 : 5;
+  boosted.Communication = hasAny(["communication", "presentation", "english", "speaking"]) ? 8 : 5;
+  boosted.Leadership = hasAny(["leadership", "management", "team lead"]) ? 8 : 5;
+  boosted.Teamwork = hasAny(["team", "collaboration", "group"]) ? 8 : 5;
+  boosted.Public_Speaking = hasAny(["public speaking", "presentation", "seminar"]) ? 8 : 4;
+  boosted.Creativity = hasAny(["design", "figma", "ui", "ux", "creative"]) ? 8 : 5;
+  boosted.Analytical_Thinking = hasAny(["analysis", "analytics", "research", "statistics", "math"]) ? 8 : 5;
+  boosted.Attention_To_Detail = hasAny(["testing", "debugging", "quality", "detail"]) ? 8 : 5;
+  boosted.Research_Interest = hasAny(["research", "paper", "experiment", "study"]) ? 8 : 4;
+  boosted.Social_Service_Interest = hasAny(["social", "ngo", "volunteer", "community"]) ? 8 : 3;
+
+  return normalizeProfileFeatures(boosted);
 }
 
 function formatDuration(totalSeconds) {
@@ -303,6 +453,13 @@ const mainOptions = [
     detail: "Use a simple questionnaire and get three to four suitable career paths."
   },
   {
+    id: "college",
+    color: "orange",
+    badge: "College match",
+    title: "College Recommendations",
+    detail: "Get college matches based on GPA, rank, budget, and course preferences."
+  },
+  {
     id: "resume",
     color: "green",
     badge: "NLP analysis",
@@ -320,7 +477,7 @@ const advisorFeatures = [
   ["Track Progress", "Save tests, resume analysis and milestones.", FileText, "progress"]
 ];
 
-function RecommendationPanel({ recommendation }) {
+function RecommendationPanel({ recommendation, onNavigate }) {
   if (!recommendation) return null;
 
   const careers = [
@@ -329,27 +486,41 @@ function RecommendationPanel({ recommendation }) {
   ].slice(0, 4);
 
   return (
-    <div className="roadmap-panel">
-      <p className="eyebrow">Career recommendations</p>
-      <h2>{recommendation.career}</h2>
-      <p>{recommendation.explanation}</p>
-      {careers.map((item, index) => (
-        <div className="job-row" key={`${item.career}-${index}`}>
-          <div>
-            <strong>{index + 1}. {item.career}</strong>
-            <small>{index === 0 ? "Best match" : "Alternative recommendation"}</small>
-          </div>
-          <span>{Math.round(Number(item.score || 0) * 100)}%</span>
+    <div className="roadmap-panel career-recommendation-panel">
+      <div className="recommendation-head">
+        <div>
+          <p className="eyebrow">Recommended career</p>
+          <h2>{recommendation.career}</h2>
+          <p>{recommendation.explanation}</p>
         </div>
-      ))}
+        <div className="recommendation-score">
+          <span>Fit score</span>
+          <strong>{Math.round((recommendation.confidence || 0) * 100)}%</strong>
+        </div>
+      </div>
+      <div className="recommendation-list">
+        {careers.map((item, index) => (
+          <div className="job-row" key={`${item.career}-${index}`}>
+            <div>
+              <strong>{index + 1}. {item.career}</strong>
+              <small>{index === 0 ? "Best match" : "Alternative recommendation"}</small>
+            </div>
+            <span>{Math.round(Number(item.score || 0) * 100)}%</span>
+          </div>
+        ))}
+      </div>
       <div className="chips">
         {recommendation.skillsToBuild?.map((skill) => <span key={skill}>{skill}</span>)}
+      </div>
+      <div className="recommendation-action">
+        <p>To explore the full learning path, certifications, and free videos, go to the guidance section.</p>
+        <button className="primary" onClick={() => onNavigate?.("guidance")}>Open guidance path</button>
       </div>
     </div>
   );
 }
 
-function CareerProfileForm({ mode, onSaved }) {
+function CareerProfileForm({ mode, onSaved, onNavigate }) {
   const [features, setFeatures] = useState(defaultProfileFeatures);
   const [mcqAnswers, setMcqAnswers] = useState({});
   const [activeQuestion, setActiveQuestion] = useState(0);
@@ -357,15 +528,26 @@ function CareerProfileForm({ mode, onSaved }) {
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const recommendationRef = useRef(null);
 
   const isGuided = mode === "guided";
   const visibleFields = profileFeatureFields;
+  const [questions] = useState(() => isGuided ? shuffleArray(profilingQuestions) : profilingQuestions);
   const answeredCount = Object.keys(mcqAnswers).length;
-  const progress = Math.round((answeredCount / profilingQuestions.length) * 100);
-  const currentQuestion = profilingQuestions[activeQuestion];
+  const progress = Math.round((answeredCount / questions.length) * 100);
+  const currentQuestion = questions[activeQuestion];
+  const currentSection = profilingSubjectGroups.find((group) => group.features.includes(currentQuestion.feature)) || profilingSubjectGroups[0];
+  const answeredAll = answeredCount === questions.length;
+  const hasCompletedTest = answeredAll;
+  const sectionProgress = profilingSubjectGroups.map((group) => {
+    const questionsForGroup = questions.filter((question) => group.features.includes(question.feature));
+    const answered = questionsForGroup.filter((question) => mcqAnswers[question.id]).length;
+    const firstQuestionIndex = questions.findIndex((question) => group.features.includes(question.feature));
+    return { ...group, questions: questionsForGroup, answered, firstQuestionIndex };
+  });
   const guidedFeatures = useMemo(
-    () => computeGuidedProfile(mcqAnswers, features.GPA),
-    [mcqAnswers, features.GPA]
+    () => computeGuidedProfile(mcqAnswers),
+    [mcqAnswers]
   );
   const subjectResults = useMemo(
     () =>
@@ -392,7 +574,7 @@ function CareerProfileForm({ mode, onSaved }) {
     try {
       const payloadFeatures = isGuided
         ? buildGuidedFeatures()
-        : features;
+        : normalizeProfileFeatures(features);
       const data = await api("/advisor/predict-profile", {
         method: "POST",
         body: JSON.stringify({ features: payloadFeatures })
@@ -402,7 +584,7 @@ function CareerProfileForm({ mode, onSaved }) {
     } catch (err) {
       const payloadFeatures = isGuided
         ? buildGuidedFeatures()
-        : features;
+        : normalizeProfileFeatures(features);
       setRecommendation(makeLocalRecommendation(payloadFeatures));
       setError("ML service is not responding, so a local recommendation is shown for testing.");
     } finally {
@@ -424,44 +606,76 @@ function CareerProfileForm({ mode, onSaved }) {
     }
   }, [secondsLeft, isGuided, answeredCount, recommendation, loading]);
 
+  useEffect(() => {
+    if (isGuided && answeredAll && !recommendation && !loading) {
+      submitProfile();
+    }
+  }, [isGuided, answeredAll, recommendation, loading]);
+
   function selectAnswer(labelText, value) {
+    const wasAnswered = Boolean(mcqAnswers[currentQuestion.id]);
     setMcqAnswers({
       ...mcqAnswers,
       [currentQuestion.id]: { label: labelText, value }
     });
+    if (!wasAnswered && activeQuestion < profilingQuestions.length - 1) {
+      window.setTimeout(() => setActiveQuestion((index) => Math.min(index + 1, profilingQuestions.length - 1)), 180);
+    }
   }
 
   return (
     <section className="advisor-card skill-builder">
       <p className="eyebrow">{isGuided ? "Career profiling test" : "Manual skills input"}</p>
       <h2>{isGuided ? "Complete your career profile" : "Enter your skills manually"}</h2>
-      <p>{isGuided ? "Answer the timed MCQ set. Each subject score is saved and used to generate your career prediction." : "Update skill and interest levels, then generate recommendations."}</p>
+      <p>{isGuided ? "Answer the five-section MCQ test. Your answers are converted into the 21 model features, academic score is derived automatically, and recommendations appear automatically after the final answer." : "Update skill and interest levels, then generate recommendations."}</p>
       {error && <p className="error">{error}</p>}
       {isGuided ? (
         <div className="profile-test-shell">
           <aside className="profile-test-sidebar">
             <div className="profile-round">
               <span>Round 1</span>
-              <strong>MCQ</strong>
-              <div className="progress"><span style={{ width: `${progress}%` }} /></div>
-              <small>{progress}% Completed</small>
+              <strong>{hasCompletedTest ? "Completed" : "MCQ"}</strong>
+              {!hasCompletedTest && (
+                <>
+                  <div className="progress"><span style={{ width: `${progress}%` }} /></div>
+                  <small>{progress}% Completed</small>
+                </>
+              )}
             </div>
-            <div className="profile-question-list">
-              {profilingQuestions.map((item, index) => (
-                <button
-                  key={item.id}
-                  className={`${activeQuestion === index ? "active" : ""} ${mcqAnswers[item.id] ? "answered" : ""}`}
-                  onClick={() => setActiveQuestion(index)}
-                >
-                  <span>{index + 1}</span>
+            {hasCompletedTest ? (
+              <div className="profile-complete-card">
+                <p className="eyebrow">Test completed</p>
+                <h3>Your profile recommendation is ready</h3>
+                <p>Scroll down to review the suggested career, fit score, and learning plan.</p>
+                <div className="profile-complete-metrics">
                   <div>
-                    <strong>MCQ</strong>
-                    <small>{profileFeatureLabels[item.feature] || item.feature}</small>
+                    <span>Completion</span>
+                    <strong>100%</strong>
                   </div>
-                  <i aria-hidden="true" />
-                </button>
-              ))}
-            </div>
+                  <div>
+                    <span>Fit score</span>
+                    <strong>{Math.round((recommendation?.confidence || 0) * 100)}%</strong>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="profile-question-list">
+                {sectionProgress.map((section, index) => (
+                  <button
+                    key={section.title}
+                    className={`${currentSection.title === section.title ? "active" : ""} ${section.answered === section.questions.length ? "answered" : ""}`}
+                    onClick={() => setActiveQuestion(section.firstQuestionIndex)}
+                  >
+                    <span>{index + 1}</span>
+                    <div>
+                      <strong>{section.title.replace(/^Section \d+: /, "")}</strong>
+                      <small>{section.answered}/{section.questions.length} answered</small>
+                    </div>
+                    <i aria-hidden="true" />
+                  </button>
+                ))}
+              </div>
+            )}
           </aside>
 
           <div className="profile-test-main">
@@ -470,10 +684,10 @@ function CareerProfileForm({ mode, onSaved }) {
                 <strong>{answeredCount} / {profilingQuestions.length}</strong>
                 <span>answered</span>
               </div>
-              <label>
-                GPA
-                <input type="number" min="0" max="10" step="0.1" value={features.GPA} onChange={(event) => updateFeature("GPA", event.target.value)} />
-              </label>
+              <div>
+                <strong>{currentSection.title.replace("Section ", "")}</strong>
+                <span>{currentSection.description}</span>
+              </div>
               <div className={secondsLeft < 300 ? "timer danger" : "timer"}>
                 <strong>{formatDuration(secondsLeft)}</strong>
                 <span>time left</span>
@@ -481,7 +695,7 @@ function CareerProfileForm({ mode, onSaved }) {
             </div>
 
             <div className="profile-question-card">
-              <span>Question {activeQuestion + 1}</span>
+              <span>{currentSection.title.replace(/^Section \d+: /, "")} | Question {activeQuestion + 1}</span>
               <h3>{currentQuestion.question}</h3>
               <div className="profile-option-list">
                 {currentQuestion.options.map(([labelText, value], optionIndex) => (
@@ -499,22 +713,28 @@ function CareerProfileForm({ mode, onSaved }) {
 
             <div className="profile-test-actions">
               <button disabled={activeQuestion === 0} onClick={() => setActiveQuestion(activeQuestion - 1)}>Back</button>
-              <button disabled={activeQuestion === profilingQuestions.length - 1} onClick={() => setActiveQuestion(activeQuestion + 1)}>Next</button>
-              <button className="primary" onClick={submitProfile} disabled={loading || answeredCount < profilingQuestions.length}>
-                {loading ? "Predicting..." : "Generate Prediction"}
+              <button disabled={activeQuestion === questions.length - 1} onClick={() => setActiveQuestion(activeQuestion + 1)}>Next</button>
+              <button
+                className="primary"
+                onClick={recommendation ? () => recommendationRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }) : submitProfile}
+                disabled={loading || answeredCount < questions.length}
+              >
+                {loading ? "Predicting..." : recommendation ? "View Results" : answeredAll ? "Generate Recommendation" : "Generate Prediction"}
                 <Sparkles size={18} />
               </button>
             </div>
 
-            <div className="subject-score-grid">
-              {subjectResults.map((group) => (
-                <div className="subject-score-card" key={group.title}>
-                  <small>{group.title}</small>
-                  <strong>{group.score}%</strong>
-                  <div><span style={{ width: `${group.score}%` }} /></div>
-                </div>
-              ))}
-            </div>
+            {!recommendation && !hasCompletedTest && (
+              <div className="subject-score-grid">
+                {subjectResults.map((group) => (
+                  <div className="subject-score-card" key={group.title}>
+                    <small>{group.title}</small>
+                    <strong>{group.score}%</strong>
+                    <div><span style={{ width: `${group.score}%` }} /></div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -557,22 +777,36 @@ function CareerProfileForm({ mode, onSaved }) {
           <Sparkles size={18} />
         </button>
       )}
-      <RecommendationPanel recommendation={recommendation} />
+      <button className="secondary" onClick={() => onNavigate?.("guidance")}>Go to Guidance Path</button>
+      <div ref={recommendationRef}>
+        <RecommendationPanel recommendation={recommendation} onNavigate={onNavigate} />
+      </div>
     </section>
   );
 }
 
-function SkillInputPanel() {
+function SkillInputPanel({ onSaved, onNavigate }) {
   const [skills, setSkills] = useState("React, Python, SQL, Communication");
   const [saved, setSaved] = useState(false);
+  const [recommendation, setRecommendation] = useState(null);
+  const [loading, setLoading] = useState(false);
   const parsed = skills.split(",").map((skill) => skill.trim()).filter(Boolean);
 
   async function saveSkills() {
+    setLoading(true);
     await api("/advisor/profile", {
       method: "PUT",
       body: JSON.stringify({ skills: parsed })
     });
+    const features = featuresFromSkillList(parsed);
+    const data = await api("/advisor/predict-profile", {
+      method: "POST",
+      body: JSON.stringify({ features })
+    });
+    setRecommendation(data.recommendation);
+    onSaved?.(data.result);
     setSaved(true);
+    setLoading(false);
   }
 
   return (
@@ -586,7 +820,11 @@ function SkillInputPanel() {
       <div className="chips">
         {parsed.map((skill) => <span key={skill}>{skill}</span>)}
       </div>
-      <button className="primary" onClick={saveSkills}>{saved ? "Skills Saved" : "Save Skills"}</button>
+      <button className="primary" onClick={saveSkills} disabled={loading}>
+        {loading ? "Generating..." : saved ? "Skills Saved + Recommendation Updated" : "Save Skills & Update Recommendation"}
+      </button>
+      <button className="secondary" onClick={() => onNavigate?.("guidance")}>Go to Guidance Path</button>
+      <RecommendationPanel recommendation={recommendation} onNavigate={onNavigate} />
     </section>
   );
 }
@@ -614,10 +852,42 @@ function CodingPracticePanel() {
 
 function JobFinderPanel() {
   const [data, setData] = useState({ jobs: jobMatches });
+  const [query, setQuery] = useState("");
+  const [location, setLocation] = useState("Remote");
+  const [experience, setExperience] = useState("Entry level");
+  const [loading, setLoading] = useState(false);
+  const debounceRef = useRef(null);
+
+  async function fetchJobs(search = query, locationValue = location, experienceValue = experience) {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        skills: search,
+        location: locationValue,
+        experience: experienceValue
+      });
+      const result = await api(`/advisor/jobs?${params.toString()}`);
+      setData(result);
+    } catch (error) {
+      setData({ jobs: jobMatches });
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    api("/advisor/jobs").then(setData).catch(() => setData({ jobs: jobMatches }));
+    fetchJobs();
   }, []);
+
+  useEffect(() => {
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = window.setTimeout(() => {
+      fetchJobs(query, location, experience);
+    }, 250);
+    return () => window.clearTimeout(debounceRef.current);
+  }, [query, location, experience]);
 
   return (
     <section className="advisor-card job-panel">
@@ -628,15 +898,178 @@ function JobFinderPanel() {
         </div>
         <Search size={22} />
       </div>
-      {data.jobs.map((job) => (
-        <div className="job-row" key={job.role}>
-          <div>
-            <strong>{job.role}</strong>
-            <small>{job.skills || job.type}</small>
-          </div>
-          <span>{job.fit}</span>
+
+      <div className="job-search-grid">
+        <label>
+          Search jobs
+          <input
+            type="search"
+            placeholder="Search by skill, role or company"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </label>
+        <label>
+          Location
+          <input
+            type="text"
+            placeholder="Remote, Hyderabad, Bengaluru"
+            value={location}
+            onChange={(event) => setLocation(event.target.value)}
+          />
+        </label>
+        <label>
+          Experience
+          <select value={experience} onChange={(event) => setExperience(event.target.value)}>
+            {['Entry level', 'Internship', 'Mid level', 'Senior'].map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className="job-status-row">
+        <small>{loading ? 'Searching jobs…' : `${data.jobs.length} jobs found`}</small>
+      </div>
+
+      {data.jobs.length === 0 ? (
+        <div className="empty-state">
+          <p>No jobs matched your search yet. Try broadening the keywords or update your location.</p>
         </div>
-      ))}
+      ) : (
+        data.jobs.map((job) => (
+          <div className="job-row" key={`${job.role}-${job.company || job.location}`}>
+            <div>
+              <strong>{job.role}</strong>
+              <small>{job.company || job.type} • {job.location}</small>
+              <p>{job.skills}</p>
+            </div>
+            <div className="job-meta">
+              <span>{job.fit}</span>
+              <small>{job.salary}</small>
+            </div>
+          </div>
+        ))
+      )}
+    </section>
+  );
+}
+
+function CollegeRecommendationPanel() {
+  const [filters, setFilters] = useState({
+    examType: "JEE",
+    examScore: 75,
+    budget: 200000,
+    location: "",
+    course: "CSE",
+    category: "General"
+  });
+  const [recommendations, setRecommendations] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  function updateFilter(key, value) {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function searchColleges() {
+    setLoading(true);
+    const data = await api("/advisor/college-recommend", {
+      method: "POST",
+      body: JSON.stringify(filters)
+    }).catch(() => ({ recommendations: [] }));
+    setRecommendations(data.recommendations || []);
+    setLoading(false);
+  }
+
+  return (
+    <section className="advisor-card college-panel">
+      <div className="section-title">
+        <div>
+          <p className="eyebrow">College recommendation</p>
+          <h2>Find your best-fit college</h2>
+        </div>
+        <Map size={24} />
+      </div>
+
+      <div className="filter-grid">
+        <label>
+          Exam type
+          <select value={filters.examType} onChange={(event) => updateFilter("examType", event.target.value)}>
+            {[
+              { label: "JEE", value: "JEE" },
+              { label: "EAMCET TS", value: "EAMCET TS" },
+              { label: "CET", value: "CET" },
+              { label: "Other CET", value: "OTHER CET" }
+            ].map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Exam score
+          <input
+            type="number"
+            min="0"
+            max="100"
+            step="1"
+            value={filters.examScore}
+            onChange={(event) => updateFilter("examScore", Number(event.target.value))}
+          />
+        </label>
+        <label>
+          Budget
+          <input
+            type="number"
+            min="0"
+            step="1000"
+            value={filters.budget}
+            onChange={(event) => updateFilter("budget", Number(event.target.value))}
+          />
+        </label>
+        <label>
+          Location
+          <input
+            value={filters.location}
+            onChange={(event) => updateFilter("location", event.target.value)}
+            placeholder="City or region"
+          />
+        </label>
+        <label>
+          Course
+          <input
+            value={filters.course}
+            onChange={(event) => updateFilter("course", event.target.value)}
+          />
+        </label>
+        <label>
+          Category
+          <select value={filters.category} onChange={(event) => updateFilter("category", event.target.value)}>
+            {['General', 'OBC', 'SC', 'ST'].map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <button className="primary" onClick={searchColleges} disabled={loading}>
+        {loading ? "Finding colleges..." : "Find colleges"}
+      </button>
+
+      <div className="recommendation-list">
+        {recommendations.length === 0 ? (
+          <p>No colleges yet. Run the search to see matched colleges.</p>
+        ) : (
+          recommendations.map((college) => (
+            <div className="job-row" key={`${college.name}-${college.location}`}>
+              <div>
+                <strong>{college.name}</strong>
+                <small>{college.location} • {college.course} • cutoff {college.cutoff}</small>
+              </div>
+              <span>{college.admissionChance}%</span>
+            </div>
+          ))
+        )}
+      </div>
     </section>
   );
 }
@@ -674,15 +1107,121 @@ function GuidancePanel() {
   }, []);
 
   return (
-    <section className="advisor-card roadmap-panel">
+    <section className="advisor-card roadmap-panel guidance-panel">
       <p className="eyebrow">Personalized guidance</p>
       <h2>{data?.career || "AI Career Suggestions"}</h2>
-      {(data?.suggestions || ["Complete the test to unlock AI-based suggestions."]).map((item, index) => (
-        <div className="road-step" key={item}>
-          <span>{index + 1}</span>
-          <p>{item}</p>
+
+      <div className="guidance-summary">
+        {(data?.suggestions || ["Complete the test to unlock AI-based suggestions."]).map((item, index) => (
+          <div className="road-step" key={item}>
+            <span>{index + 1}</span>
+            <p>{item}</p>
+          </div>
+        ))}
+      </div>
+
+      {data?.learningPath?.length ? (
+        <div className="guidance-flow">
+          {data.learningPath.map((step, index) => (
+            <div className="flow-step" key={step}>
+              <div className="flow-step-number">{index + 1}</div>
+              <div className="flow-step-body">
+                <strong>{step}</strong>
+              </div>
+              {index < data.learningPath.length - 1 && <div className="flow-connector">→</div>}
+            </div>
+          ))}
         </div>
-      ))}
+      ) : null}
+
+      {data?.learningResources?.length ? (
+        <>
+          <h4>Free learning resources</h4>
+          <div className="video-grid">
+            {data.learningResources.map((resource) => (
+              <a
+                key={resource.skill}
+                className="video-card"
+                href={resource.youtube}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img src={`https://img.youtube.com/vi/${resource.videoId}/hqdefault.jpg`} alt={resource.skill} />
+                <div>
+                  <strong>{resource.skill}</strong>
+                  <small>Free YouTube course</small>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div className="certification-list">
+            <h4>Free certifications</h4>
+            {data.learningResources.flatMap((resource) => resource.certifications || []).map((cert) => (
+              <a key={cert.url} href={cert.url} target="_blank" rel="noreferrer" className="cert-link">
+                {cert.title}
+              </a>
+            ))}
+          </div>
+        </>
+      ) : null}
+    </section>
+  );
+}
+
+function ChatPanel() {
+  const [messages, setMessages] = useState([
+    { role: "assistant", text: "Hello! I’m your career AI coach. Ask me about skills, study plans, or career paths." }
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function sendMessage() {
+    if (!input.trim() || loading) return;
+    const nextMessages = [...messages, { role: "user", text: input.trim() }];
+    setMessages(nextMessages);
+    setInput("");
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await api("/advisor/chat", {
+        method: "POST",
+        body: JSON.stringify({ text: input.trim() })
+      });
+      setMessages((prev) => [...prev, { role: "assistant", text: response.answer }]);
+    } catch (err) {
+      setError(err.message || "Unable to connect to the career chat.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section className="advisor-card chat-panel">
+      <p className="eyebrow">Career Chat</p>
+      <h2>AI Career Coach</h2>
+      <div className="chat-messages">
+        {messages.map((message, index) => (
+          <div key={`${message.role}-${index}`} className={`chat-message ${message.role}`}>
+            <div className="chat-avatar">{message.role === "assistant" ? "🤖" : "🧑"}</div>
+            <div className="chat-text">{message.text}</div>
+          </div>
+        ))}
+      </div>
+      {error && <p className="error">{error}</p>}
+      <div className="chat-input-area">
+        <input
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          placeholder="Ask about careers, skills, or next steps..."
+          onKeyDown={(event) => event.key === "Enter" && sendMessage()}
+          disabled={loading}
+        />
+        <button className="primary" onClick={sendMessage} disabled={loading || !input.trim()}>
+          {loading ? "Thinking..." : "Send"}
+        </button>
+      </div>
     </section>
   );
 }
@@ -842,19 +1381,10 @@ function MainOptions({ activeFeature, onSelect }) {
 }
 
 function Dashboard({ user, onLogout }) {
-  const [results, setResults] = useState([]);
   const [activeFeature, setActiveFeature] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const latest = results[0];
-
-  async function refresh() {
-    const data = await api("/tests/results");
-    setResults(data.results);
-  }
-
-  useEffect(() => {
-    refresh();
-  }, []);
+  const latest = null;
+  const hideInsightRail = ["career-profile", "manual-profile", "resume"].includes(activeFeature);
 
   return (
     <main className={`portal-shell ${sidebarOpen ? "" : "sidebar-closed"}`}>
@@ -925,22 +1455,19 @@ function Dashboard({ user, onLogout }) {
           <MainOptions activeFeature={activeFeature} onSelect={setActiveFeature} />
         )}
 
-        <section className="portal-content">
+        <section className={`portal-content ${hideInsightRail ? "portal-content--wide" : ""}`}>
           <div className="primary-workspace">
-            {["career-profile", "manual-profile", "resume"].includes(activeFeature) && (
+            {["career-profile", "manual-profile", "resume", "college"].includes(activeFeature) && (
               <button className="explore-btn" onClick={() => setActiveFeature("dashboard")}>
                 <ArrowRight size={18} /> Back to options
               </button>
             )}
-            {activeFeature === "aptitude" && <TestPanel onSaved={(result) => {
-              setResults([result, ...results]);
-              setActiveFeature("profile");
-            }} />}
-            {activeFeature === "career-profile" && <CareerProfileForm mode="guided" onSaved={(result) => setResults([result, ...results])} />}
-            {activeFeature === "manual-profile" && <CareerProfileForm mode="manual" onSaved={(result) => setResults([result, ...results])} />}
-            {activeFeature === "coding" && <CodingPracticePanel />}
-            {activeFeature === "skills" && <SkillInputPanel />}
-            {activeFeature === "resume" && <ResumePanel />}
+            {activeFeature === "career-profile" && <CareerProfileForm mode="guided" onNavigate={setActiveFeature} />}
+            {activeFeature === "manual-profile" && <CareerProfileForm mode="manual" onNavigate={setActiveFeature} />}
+            {activeFeature === "chat" && <ChatPanel />}
+            {activeFeature === "skills" && <SkillInputPanel onNavigate={setActiveFeature} />}
+            {activeFeature === "college" && <CollegeRecommendationPanel />}
+            {activeFeature === "resume" && <ResumePanel onNavigate={setActiveFeature} />}
             {activeFeature === "jobs" && <JobFinderPanel />}
             {activeFeature === "courses" && <RoadmapPanel />}
             {activeFeature === "guidance" && <GuidancePanel />}
@@ -948,36 +1475,36 @@ function Dashboard({ user, onLogout }) {
             {activeFeature === "mentor" && <MentorPanel />}
             {activeFeature === "progress" && <ProgressPanel />}
             {activeFeature === "profile" && <ProfilePanel user={user} />}
-            <div className="history premium-history">
-              <h3>Stored Results</h3>
-              {results.length === 0 && <p>Results will appear here after your first test.</p>}
-              {results.map((result) => (
-                <button className="history-item" key={result._id}>
-                  <span>{result.recommendation?.career}</span>
-                  <small>{new Date(result.createdAt).toLocaleString()}</small>
-                </button>
-              ))}
-            </div>
           </div>
-          <aside className="insight-rail">
-            <ResultPanel result={latest} />
-            <div className="mini-calendar">
-              <div className="section-title">
-                <h3>May 2026</h3>
-                <CalendarDays size={20} />
+          {!hideInsightRail && (
+            <aside className="insight-rail">
+              <ResultPanel result={latest} onNavigate={setActiveFeature} />
+              <div className="mini-calendar">
+                <div className="section-title">
+                  <h3>May 2026</h3>
+                  <CalendarDays size={20} />
+                </div>
+                <div className="calendar-grid">
+                  {Array.from({ length: 14 }, (_, index) => (
+                    <span className={index === 5 ? "today" : index > 8 ? "locked" : ""} key={index}>{index + 12}</span>
+                  ))}
+                </div>
               </div>
-              <div className="calendar-grid">
-                {Array.from({ length: 14 }, (_, index) => (
-                  <span className={index === 5 ? "today" : index > 8 ? "locked" : ""} key={index}>{index + 12}</span>
-                ))}
-              </div>
-            </div>
-            <RoadmapPanel />
-          </aside>
+              <RoadmapPanel />
+            </aside>
+          )}
         </section>
       </section>
+      <button className="chatbot-launcher" onClick={() => setActiveFeature("chat")}> 
+        <span className="chatbot-icon">💬</span>
+        <div>
+          <strong>Career Coach</strong>
+          <small>Ask the AI</small>
+        </div>
+      </button>
     </main>
   );
 }
 export default Dashboard;
+
 

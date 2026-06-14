@@ -1,6 +1,6 @@
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Compass } from "lucide-react";
 import React from "react";
-function ResultPanel({ result }) {
+function ResultPanel({ result, onNavigate }) {
   if (!result) {
     return (
       <section className="empty-state">
@@ -12,12 +12,11 @@ function ResultPanel({ result }) {
   }
 
   const recommendation = result.recommendation;
-  const scores = Object.fromEntries(Object.entries(result.scores || {}));
 
   return (
     <section className="result-grid">
       <div className="recommendation">
-        <p className="eyebrow">Recommended path</p>
+        <p className="eyebrow">Recommended career</p>
         <h2>{recommendation.career}</h2>
         <p>{recommendation.explanation}</p>
         <div className="confidence">
@@ -26,23 +25,15 @@ function ResultPanel({ result }) {
         </div>
       </div>
       <div className="panel">
-        <h3>Education Path</h3>
-        {recommendation.educationPath?.map((item) => <p className="path-item" key={item}>{item}</p>)}
+        <h3>Next steps</h3>
+        <p>Open the guidance path to view the detailed learning flow, free YouTube videos, and certification recommendations.</p>
+        <button className="primary" onClick={() => onNavigate?.("guidance")}>Open guidance path</button>
       </div>
-      <div className="panel">
-        <h3>Skills To Build</h3>
+      <div className="panel score-panel">
+        <h3>Profile signals</h3>
         <div className="chips">
           {recommendation.skillsToBuild?.map((skill) => <span key={skill}>{skill}</span>)}
         </div>
-      </div>
-      <div className="panel score-panel">
-        <h3>Profile Signals</h3>
-        {Object.entries(scores).map(([name, value]) => (
-          <div className="score" key={name}>
-            <span>{name.replace("_", " ")}</span>
-            <div><span style={{ width: `${Number(value) * 20}%` }} /></div>
-          </div>
-        ))}
       </div>
     </section>
   );

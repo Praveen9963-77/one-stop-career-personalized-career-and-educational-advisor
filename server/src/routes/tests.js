@@ -6,6 +6,25 @@ import TestResult from "../models/TestResult.js";
 
 const router = express.Router();
 
+function safeNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function normalizeRecommendation(recommendation) {
+  if (!recommendation || typeof recommendation !== "object") return recommendation;
+  return {
+    ...recommendation,
+    confidence: safeNumber(recommendation.confidence),
+    alternatives: Array.isArray(recommendation.alternatives)
+      ? recommendation.alternatives.map((item) => ({
+          ...item,
+          score: safeNumber(item.score)
+        }))
+      : recommendation.alternatives
+  };
+}
+
 function scoreAnswers(answers) {
   const scores = {};
   const counts = {};
@@ -65,7 +84,7 @@ router.post("/submit", requireAuth, async (req, res) => {
 
   try {
     const ml = await axios.post(`${process.env.ML_SERVICE_URL}/predict`, { scores }, { timeout: 5000 });
-    recommendation = ml.data;
+    recommendation = normalizeRecommendation(ml.data);
   } catch {
     recommendation = fallbackRecommendation(scores);
   }

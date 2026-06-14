@@ -13,14 +13,22 @@ const defaultAnswers = {
   problem_solving: 3,
   academic_score: 3,
 };
-function TestPanel({ onSaved }) {
+function shuffleArray(items) {
+  const array = [...items];
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+function TestPanel({ onSaved, onNavigate }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState(defaultAnswers);
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    api("/tests/questions").then((data) => setQuestions(data.questions));
+    api("/tests/questions").then((data) => setQuestions(shuffleArray(data.questions)));
   }, []);
 
   const question = questions[active];
@@ -90,6 +98,7 @@ function TestPanel({ onSaved }) {
           <button className="primary" onClick={submit} disabled={loading || !selectedAnswer}>{loading ? "Analyzing..." : "Get recommendation"} <Sparkles size={18} /></button>
         )}
       </div>
+      <button className="secondary" onClick={() => onNavigate?.("guidance")}>Go to Guidance Path</button>
     </section>
   );
 }

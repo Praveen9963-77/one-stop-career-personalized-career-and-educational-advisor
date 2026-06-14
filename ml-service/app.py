@@ -56,11 +56,11 @@ STOP_WORDS = {
 }
 
 TREE_FEATURES = [
-    "Math_Score",
-    "Physics_Score",
-    "Chemistry_Score",
-    "Biology_Score",
-    "English_Score",
+    "Math_Interest",
+    "Physics_Interest",
+    "Chemistry_Interest",
+    "Biology_Interest",
+    "English_Interest",
     "GPA",
     "Coding_Skill",
     "Problem_Solving",

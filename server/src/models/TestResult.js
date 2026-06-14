@@ -6,7 +6,27 @@ const recommendationSchema = new mongoose.Schema(
     confidence: Number,
     educationPath: [String],
     skillsToBuild: [String],
-    explanation: String
+    explanation: String,
+    alternatives: [
+      {
+        career: String,
+        score: Number
+      }
+    ],
+    learningResources: [
+      {
+        skill: String,
+        youtube: String,
+        certifications: [
+          {
+            title: String,
+            url: String
+          }
+        ]
+      }
+    ],
+    model: String,
+    dataset: String
   },
   { _id: false }
 );
@@ -22,4 +42,3 @@ const testResultSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("TestResult", testResultSchema);
-

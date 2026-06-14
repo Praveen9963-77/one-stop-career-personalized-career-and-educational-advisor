@@ -44,9 +44,39 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ message: "Something went wrong" });
 });
 
+function listenOnPort(portToTry) {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(portToTry, () => resolve(server));
+    server.once("error", reject);
+  });
+}
+
 connectDb(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/career_advisor")
-  .then(() => {
-    app.listen(port, () => console.log(`API running on http://localhost:${port}`));
+  .then(async () => {
+    let currentPort = Number(process.env.PORT) || 5000;
+    const maxPort = currentPort + 10;
+    let server;
+
+    while (currentPort <= maxPort) {
+      try {
+        server = await listenOnPort(currentPort);
+        console.log(`API running on http://localhost:${currentPort}`);
+        break;
+      } catch (error) {
+        if (error.code === "EADDRINUSE") {
+          console.warn(`Port ${currentPort} is already in use. Trying port ${currentPort + 1}...`);
+          currentPort += 1;
+        } else {
+          console.error("Server error", error);
+          process.exit(1);
+        }
+      }
+    }
+
+    if (!server) {
+      console.error(`Unable to bind to ports ${port} through ${maxPort}.`);
+      process.exit(1);
+    }
   })
   .catch((error) => {
     console.error("Failed to start API", error);

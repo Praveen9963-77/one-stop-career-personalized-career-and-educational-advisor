@@ -52,6 +52,61 @@ const careerCatalog = {
     skills: ["Figma", "User Research", "Wireframing", "Accessibility", "Prototyping"],
     roadmap: ["Design basics", "User interviews", "Wireframes", "Interactive prototypes", "Portfolio case study"],
     jobs: ["UX Design Intern", "Product Design Trainee", "UI Designer"]
+  },
+  "Data Scientist": {
+    skills: ["Python", "Statistics", "SQL", "Machine Learning", "Data Visualization"],
+    roadmap: ["Python and statistics", "SQL and data cleaning", "ML model building", "Portfolio notebooks", "Deploy one ML app"],
+    jobs: ["Data Science Intern", "Junior Data Scientist", "ML Analyst"]
+  },
+  "AI Engineer": {
+    skills: ["Python", "Machine Learning", "Deep Learning", "NLP", "Model Deployment"],
+    roadmap: ["Python and ML basics", "Deep learning projects", "NLP or computer vision", "Model evaluation", "Deploy AI service"],
+    jobs: ["AI Engineer Intern", "ML Engineer", "NLP Engineer"]
+  },
+  "Cybersecurity Analyst": {
+    skills: ["Networking", "Linux", "OWASP", "SIEM", "Incident Response"],
+    roadmap: ["Networking fundamentals", "Linux and scripting", "Web security labs", "Threat monitoring", "Security report portfolio"],
+    jobs: ["SOC Analyst", "Security Analyst Intern", "Cybersecurity Trainee"]
+  },
+  "Blockchain Developer": {
+    skills: ["Solidity", "Smart Contracts", "Web3.js", "Cryptography", "Security"],
+    roadmap: ["Blockchain fundamentals", "Solidity basics", "Smart contract projects", "Web3 frontend", "Audit and deploy demo"],
+    jobs: ["Blockchain Developer Intern", "Web3 Developer", "Smart Contract Developer"]
+  },
+  "Cloud Engineer": {
+    skills: ["AWS", "Linux", "Networking", "Docker", "Monitoring"],
+    roadmap: ["Linux and networking", "AWS/Azure basics", "Docker deployment", "Monitoring and logs", "Cloud project portfolio"],
+    jobs: ["Cloud Support Engineer", "Junior Cloud Engineer", "Cloud Operations Trainee"]
+  },
+  "DevOps Engineer": {
+    skills: ["CI/CD", "Docker", "Kubernetes", "Linux", "Automation"],
+    roadmap: ["Linux and Git", "CI/CD pipelines", "Docker containers", "Kubernetes basics", "Deploy monitored app"],
+    jobs: ["DevOps Intern", "Release Engineer", "Cloud DevOps Trainee"]
+  },
+  "Mobile App Developer": {
+    skills: ["Flutter", "React Native", "API Integration", "Mobile UI", "Local Storage"],
+    roadmap: ["Mobile UI basics", "State management", "API integration", "Local storage", "Publish demo app"],
+    jobs: ["Mobile Developer Intern", "Flutter Developer", "React Native Developer"]
+  },
+  "Product Manager": {
+    skills: ["User Research", "Analytics", "Roadmapping", "Communication", "Prioritization"],
+    roadmap: ["Product thinking", "User research", "Analytics dashboards", "PRD writing", "Case study portfolio"],
+    jobs: ["Product Analyst", "Associate Product Manager", "Product Intern"]
+  },
+  "Digital Marketing Specialist": {
+    skills: ["SEO", "Content Marketing", "Campaign Analytics", "Social Media", "Copywriting"],
+    roadmap: ["SEO basics", "Content strategy", "Ad campaign analytics", "Portfolio campaigns", "Marketing certification"],
+    jobs: ["Digital Marketing Executive", "SEO Analyst", "Growth Marketing Intern"]
+  },
+  "QA Automation Engineer": {
+    skills: ["Manual Testing", "Selenium", "API Testing", "Test Cases", "Bug Reporting"],
+    roadmap: ["Testing fundamentals", "Test case design", "Automation scripting", "API testing", "QA project portfolio"],
+    jobs: ["QA Tester", "Automation Tester", "QA Analyst Intern"]
+  },
+  "Database Administrator": {
+    skills: ["SQL", "MongoDB", "Indexing", "Backups", "Performance Tuning"],
+    roadmap: ["SQL fundamentals", "Database design", "Indexing and queries", "Backup/recovery", "Performance tuning project"],
+    jobs: ["Database Administrator Trainee", "SQL Developer", "Data Operations Analyst"]
   }
 };
 
@@ -79,22 +134,53 @@ const jobCatalog = [
 ];
 
 const collegeCatalog = [
-  { name: "IIT Bombay", course: "B.Tech CSE", location: "Mumbai", fees: 240000, placement: "32 LPA avg", cutoff: 98, rating: 4.9, acceptedExams: ["JEE"] },
-  { name: "IIT Delhi", course: "B.Tech EE", location: "New Delhi", fees: 220000, placement: "31 LPA avg", cutoff: 97, rating: 4.9, acceptedExams: ["JEE"] },
-  { name: "IIIT Hyderabad", course: "B.Tech CSE", location: "Hyderabad", fees: 260000, placement: "35 LPA avg", cutoff: 96, rating: 4.8, acceptedExams: ["JEE"] },
-  { name: "NIT Trichy", course: "B.Tech Mechanical", location: "Trichy", fees: 150000, placement: "14 LPA avg", cutoff: 93, rating: 4.7, acceptedExams: ["JEE"] },
-  { name: "BITS Pilani", course: "B.E. Computer Science", location: "Pilani", fees: 270000, placement: "28 LPA avg", cutoff: 94, rating: 4.7, acceptedExams: ["JEE"] },
-  { name: "VIT Vellore", course: "B.Tech CSE", location: "Vellore", fees: 198000, placement: "9.2 LPA avg", cutoff: 85, rating: 4.5, acceptedExams: ["JEE", "CET"] },
-  { name: "NIT Warangal", course: "B.Tech CSE", location: "Warangal", fees: 155000, placement: "13 LPA avg", cutoff: 92, rating: 4.7, acceptedExams: ["JEE", "EAMCET TS"] },
-  { name: "JNTU Hyderabad", course: "B.Tech CSE", location: "Hyderabad", fees: 120000, placement: "8.5 LPA avg", cutoff: 72, rating: 4.3, acceptedExams: ["EAMCET TS"] },
-  { name: "Osmania University", course: "B.Tech AI & DS", location: "Hyderabad", fees: 90000, placement: "7.8 LPA avg", cutoff: 68, rating: 4.2, acceptedExams: ["EAMCET TS"] },
-  { name: "RV College of Engineering", course: "B.E. CSE", location: "Bengaluru", fees: 170000, placement: "15 LPA avg", cutoff: 83, rating: 4.4, acceptedExams: ["CET", "OTHER CET"] },
-  { name: "PES University", course: "B.Tech CSE", location: "Bengaluru", fees: 210000, placement: "16 LPA avg", cutoff: 88, rating: 4.3, acceptedExams: ["CET", "JEE"] },
-  { name: "COEP Pune", course: "B.Tech Civil", location: "Pune", fees: 140000, placement: "11 LPA avg", cutoff: 82, rating: 4.3, acceptedExams: ["CET", "OTHER CET"] },
-  { name: "IIT Kharagpur", course: "B.Tech Electrical", location: "Kharagpur", fees: 230000, placement: "27 LPA avg", cutoff: 96, rating: 4.8, acceptedExams: ["JEE"] },
-  { name: "NIT Durgapur", course: "B.Tech ECE", location: "Durgapur", fees: 145000, placement: "12 LPA avg", cutoff: 90, rating: 4.4, acceptedExams: ["JEE"] },
-  { name: "IIIT Bhubaneswar", course: "B.Tech Data Science", location: "Bhubaneswar", fees: 160000, placement: "12.5 LPA avg", cutoff: 91, rating: 4.5, acceptedExams: ["JEE"] },
-  { name: "KL University", course: "B.Tech CSE", location: "Vijayawada", fees: 140000, placement: "9 LPA avg", cutoff: 76, rating: 4.1, acceptedExams: ["EAMCET TS", "OTHER CET"] }
+  { name: "IIT Madras", course: "B.Tech CSE", location: "Chennai", fees: 220000, placement: "30 LPA avg", cutoff: 99.7, eamcetRank: null, rating: 4.9, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 1" },
+  { name: "IIT Delhi", course: "B.Tech CSE", location: "New Delhi", fees: 220000, placement: "31 LPA avg", cutoff: 99.6, eamcetRank: null, rating: 4.9, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 2" },
+  { name: "IIT Bombay", course: "B.Tech CSE", location: "Mumbai", fees: 240000, placement: "32 LPA avg", cutoff: 99.6, eamcetRank: null, rating: 4.9, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 3" },
+  { name: "IIT Kanpur", course: "B.Tech CSE", location: "Kanpur", fees: 220000, placement: "29 LPA avg", cutoff: 99.4, eamcetRank: null, rating: 4.8, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 4" },
+  { name: "IIT Kharagpur", course: "B.Tech CSE", location: "Kharagpur", fees: 230000, placement: "27 LPA avg", cutoff: 99.2, eamcetRank: null, rating: 4.8, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 5" },
+  { name: "IIT Roorkee", course: "B.Tech CSE", location: "Roorkee", fees: 220000, placement: "26 LPA avg", cutoff: 99.1, eamcetRank: null, rating: 4.8, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 6" },
+  { name: "IIT Guwahati", course: "B.Tech CSE", location: "Guwahati", fees: 220000, placement: "25 LPA avg", cutoff: 98.9, eamcetRank: null, rating: 4.7, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 7" },
+  { name: "IIT Hyderabad", course: "B.Tech CSE", location: "Hyderabad", fees: 220000, placement: "24 LPA avg", cutoff: 98.8, eamcetRank: null, rating: 4.8, acceptedExams: ["JEE"], type: "Hyderabad/National", source: "NIRF 2024 Engineering Rank 8" },
+  { name: "NIT Trichy", course: "B.Tech CSE", location: "Tiruchirappalli", fees: 150000, placement: "18 LPA avg", cutoff: 98.0, eamcetRank: null, rating: 4.7, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 9" },
+  { name: "IIT BHU Varanasi", course: "B.Tech CSE", location: "Varanasi", fees: 220000, placement: "24 LPA avg", cutoff: 98.3, eamcetRank: null, rating: 4.7, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 10" },
+  { name: "VIT Vellore", course: "B.Tech CSE", location: "Vellore", fees: 198000, placement: "9.5 LPA avg", cutoff: 88.0, eamcetRank: null, rating: 4.5, acceptedExams: ["JEE", "OTHER CET"], type: "National", source: "NIRF 2024 Engineering Rank 11" },
+  { name: "Jadavpur University", course: "B.Tech CSE", location: "Kolkata", fees: 12000, placement: "14 LPA avg", cutoff: 95.0, eamcetRank: null, rating: 4.6, acceptedExams: ["JEE", "OTHER CET"], type: "National", source: "NIRF 2024 Engineering Rank 12" },
+  { name: "SRM Institute of Science and Technology", course: "B.Tech CSE", location: "Chennai", fees: 250000, placement: "8 LPA avg", cutoff: 82.0, eamcetRank: null, rating: 4.2, acceptedExams: ["JEE", "OTHER CET"], type: "National", source: "NIRF 2024 Engineering Rank 13" },
+  { name: "Anna University", course: "B.Tech IT", location: "Chennai", fees: 60000, placement: "8.5 LPA avg", cutoff: 92.0, eamcetRank: null, rating: 4.5, acceptedExams: ["OTHER CET", "JEE"], type: "National", source: "NIRF 2024 Engineering Rank 14" },
+  { name: "IIT ISM Dhanbad", course: "B.Tech CSE", location: "Dhanbad", fees: 220000, placement: "20 LPA avg", cutoff: 97.5, eamcetRank: null, rating: 4.6, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 15" },
+  { name: "IIT Indore", course: "B.Tech CSE", location: "Indore", fees: 220000, placement: "22 LPA avg", cutoff: 97.6, eamcetRank: null, rating: 4.6, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 16" },
+  { name: "NIT Surathkal", course: "B.Tech CSE", location: "Surathkal", fees: 150000, placement: "18 LPA avg", cutoff: 97.4, eamcetRank: null, rating: 4.6, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 17" },
+  { name: "IIT Gandhinagar", course: "B.Tech CSE", location: "Gandhinagar", fees: 220000, placement: "19 LPA avg", cutoff: 97.0, eamcetRank: null, rating: 4.5, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 18" },
+  { name: "NIT Rourkela", course: "B.Tech CSE", location: "Rourkela", fees: 150000, placement: "15 LPA avg", cutoff: 96.5, eamcetRank: null, rating: 4.5, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 19" },
+  { name: "BITS Pilani", course: "B.E. Computer Science", location: "Pilani", fees: 270000, placement: "28 LPA avg", cutoff: 94.0, eamcetRank: null, rating: 4.7, acceptedExams: ["JEE", "OTHER CET"], type: "National", source: "NIRF 2024 Engineering Rank 20" },
+  { name: "NIT Warangal", course: "B.Tech CSE", location: "Warangal", fees: 155000, placement: "18 LPA avg", cutoff: 97.0, eamcetRank: null, rating: 4.7, acceptedExams: ["JEE"], type: "Telangana/National", source: "NIRF 2024 Engineering Rank 21" },
+  { name: "DTU Delhi", course: "B.Tech CSE", location: "New Delhi", fees: 220000, placement: "16 LPA avg", cutoff: 96.0, eamcetRank: null, rating: 4.5, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 27" },
+  { name: "IIIT Hyderabad", course: "B.Tech CSE", location: "Hyderabad", fees: 360000, placement: "32 LPA avg", cutoff: 98.5, eamcetRank: null, rating: 4.8, acceptedExams: ["JEE"], type: "Hyderabad/National", source: "Institute admissions/JEE-mode catalog" },
+  { name: "University College of Engineering, Osmania University", course: "B.E. CSE", location: "Hyderabad", fees: 50000, placement: "8 LPA avg", cutoff: null, eamcetRank: 1200, rating: 4.4, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "JNTUH College of Engineering Hyderabad", course: "B.Tech CSE", location: "Hyderabad", fees: 50000, placement: "8.5 LPA avg", cutoff: null, eamcetRank: 1800, rating: 4.4, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "CBIT Hyderabad", course: "B.E. CSE", location: "Hyderabad", fees: 160000, placement: "8 LPA avg", cutoff: null, eamcetRank: 3500, rating: 4.3, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Vasavi College of Engineering", course: "B.E. CSE", location: "Hyderabad", fees: 150000, placement: "7.5 LPA avg", cutoff: null, eamcetRank: 5000, rating: 4.3, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "VNR VJIET", course: "B.Tech CSE", location: "Hyderabad", fees: 135000, placement: "7.5 LPA avg", cutoff: null, eamcetRank: 6500, rating: 4.2, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "GRIET Hyderabad", course: "B.Tech CSE", location: "Hyderabad", fees: 125000, placement: "6.8 LPA avg", cutoff: null, eamcetRank: 8500, rating: 4.1, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Muffakham Jah College of Engineering", course: "B.E. CSE", location: "Hyderabad", fees: 125000, placement: "6.5 LPA avg", cutoff: null, eamcetRank: 11000, rating: 4.0, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "MGIT Hyderabad", course: "B.Tech CSE", location: "Hyderabad", fees: 110000, placement: "6.2 LPA avg", cutoff: null, eamcetRank: 14000, rating: 4.0, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "CVR College of Engineering", course: "B.Tech CSE", location: "Hyderabad", fees: 130000, placement: "6.5 LPA avg", cutoff: null, eamcetRank: 15000, rating: 4.1, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "BVRIT Narsapur", course: "B.Tech CSE", location: "Hyderabad Region", fees: 120000, placement: "6 LPA avg", cutoff: null, eamcetRank: 17000, rating: 4.0, acceptedExams: ["EAMCET TS"], type: "Hyderabad Region", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Anurag University", course: "B.Tech CSE", location: "Hyderabad", fees: 250000, placement: "6 LPA avg", cutoff: null, eamcetRank: 19000, rating: 4.0, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Institute of Aeronautical Engineering", course: "B.Tech CSE", location: "Hyderabad", fees: 115000, placement: "5.8 LPA avg", cutoff: null, eamcetRank: 22000, rating: 3.9, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "CMR College of Engineering & Technology", course: "B.Tech CSE", location: "Hyderabad", fees: 105000, placement: "5.5 LPA avg", cutoff: null, eamcetRank: 25000, rating: 3.9, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "CMR Institute of Technology Hyderabad", course: "B.Tech CSE", location: "Hyderabad", fees: 100000, placement: "5.2 LPA avg", cutoff: null, eamcetRank: 30000, rating: 3.8, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Malla Reddy Engineering College", course: "B.Tech CSE", location: "Hyderabad", fees: 100000, placement: "5 LPA avg", cutoff: null, eamcetRank: 35000, rating: 3.8, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "MLR Institute of Technology", course: "B.Tech CSE", location: "Hyderabad", fees: 95000, placement: "5 LPA avg", cutoff: null, eamcetRank: 38000, rating: 3.8, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "St. Martin's Engineering College", course: "B.Tech CSE", location: "Hyderabad", fees: 85000, placement: "4.5 LPA avg", cutoff: null, eamcetRank: 45000, rating: 3.6, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Sreenidhi Institute of Science and Technology", course: "B.Tech CSE", location: "Hyderabad", fees: 135000, placement: "6.4 LPA avg", cutoff: null, eamcetRank: 12500, rating: 4.0, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Keshav Memorial Institute of Technology", course: "B.Tech CSE", location: "Hyderabad", fees: 103000, placement: "6 LPA avg", cutoff: null, eamcetRank: 9000, rating: 4.1, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Neil Gogte Institute of Technology", course: "B.Tech CSE", location: "Hyderabad", fees: 90000, placement: "5.2 LPA avg", cutoff: null, eamcetRank: 28000, rating: 3.8, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Gokaraju Rangaraju Institute of Engineering and Technology", course: "B.Tech AI & ML", location: "Hyderabad", fees: 125000, placement: "6.8 LPA avg", cutoff: null, eamcetRank: 10500, rating: 4.1, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "VNR VJIET", course: "B.Tech AI & DS", location: "Hyderabad", fees: 135000, placement: "7 LPA avg", cutoff: null, eamcetRank: 9000, rating: 4.2, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "CBIT Hyderabad", course: "B.E. ECE", location: "Hyderabad", fees: 160000, placement: "7 LPA avg", cutoff: null, eamcetRank: 9000, rating: 4.2, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" },
+  { name: "Vasavi College of Engineering", course: "B.E. IT", location: "Hyderabad", fees: 150000, placement: "7.2 LPA avg", cutoff: null, eamcetRank: 7000, rating: 4.2, acceptedExams: ["EAMCET TS"], type: "Hyderabad", source: "TG EAPCET-style cutoff catalog" }
 ];
 
 const learningCatalog = {
@@ -452,11 +538,37 @@ router.get("/mentor", requireAuth, async (req, res) => {
   const { career, catalog } = await getContext(req.user.id);
   res.json({
     career,
+    mentors: [
+      {
+        name: "Placement Mentor",
+        focus: "Resume review, internship strategy, interview preparation",
+        availability: "Today 7:00 PM",
+        match: 92
+      },
+      {
+        name: `${career} Expert`,
+        focus: `${catalog.skills.slice(0, 3).join(", ")} roadmap and project review`,
+        availability: "Tomorrow 6:30 PM",
+        match: 88
+      },
+      {
+        name: "Alumni Guide",
+        focus: "College choices, learning plan, portfolio feedback",
+        availability: "Weekend slot",
+        match: 84
+      }
+    ],
     mentorTips: [
       `Prepare a short introduction explaining why you want to become a ${career}.`,
       `Build proof for ${catalog.skills.slice(0, 2).join(" and ")} before applying.`,
       "Ask mentors to review your resume, project explanation, and interview answers."
     ],
+    sessionPlan: [
+      "Share your target role, current skills, and latest test or resume result.",
+      `Ask the mentor to review one ${career} project idea before you build it.`,
+      "End the session with three action items and one deadline."
+    ],
+    bookingSlots: ["Today 7:00 PM", "Tomorrow 6:30 PM", "Saturday 11:00 AM"],
     chatPrompts: ["Review my career path", "Suggest a project", "Prepare interview questions"]
   });
 });
@@ -542,40 +654,59 @@ router.post("/college-recommend", requireAuth, async (req, res) => {
   const {
     examType = "JEE",
     examScore = 60,
+    eamcetMarks = 80,
+    eamcetRank = 0,
     budget = 200000,
     location = "",
     course = "CSE",
     category = "General"
   } = req.body;
 
-  const scoreValue = Math.min(100, Math.max(0, Number(examScore) || 0));
+  const jeePercentile = Math.min(100, Math.max(0, Number(examScore) || 0));
+  const eamcetMarksValue = Math.min(160, Math.max(0, Number(eamcetMarks) || 0));
+  const eamcetRankValue = Math.max(0, Number(eamcetRank) || 0);
+  const estimatedEamcetRank = eamcetRankValue || Math.max(500, Math.round(85000 - (eamcetMarksValue / 160) * 83500));
   const normalizedLocation = String(location || "").trim().toLowerCase();
   const normalizedCourse = String(course || "").trim().toLowerCase();
+  const budgetValue = Number(budget) || 0;
+  const usesEamcet = examType === "EAMCET TS";
 
   const recommendations = collegeCatalog
-    .filter((college) => college.fees <= Number(budget) || Number(budget) === 0)
+    .filter((college) => college.fees <= budgetValue || budgetValue === 0)
     .filter((college) => college.acceptedExams.includes(examType) || (examType === "OTHER CET" && college.acceptedExams.some((exam) => exam.includes("CET"))))
     .map((college) => {
-      const examFit = Math.max(0, 100 - Math.abs((college.cutoff || 60) - scoreValue));
-      const budgetFit = Math.min(1, Number(budget) / Math.max(1, college.fees));
+      const examFit = usesEamcet
+        ? Math.max(0, Math.min(100, 100 - ((estimatedEamcetRank - (college.eamcetRank || 85000)) / Math.max(1, college.eamcetRank || 85000)) * 70))
+        : Math.max(0, 100 - Math.abs((college.cutoff || 60) - jeePercentile) * 2.2);
+      const budgetFit = Math.min(1, budgetValue / Math.max(1, college.fees));
       const locationMatch = normalizedLocation && college.location.toLowerCase().includes(normalizedLocation) ? 1 : 0.85;
       const courseMatch = normalizedCourse && college.course.toLowerCase().includes(normalizedCourse) ? 1 : 0.9;
-      const casteBonus = category === "General" ? 0 : 5;
+      const casteBonus = category === "General" ? 0 : usesEamcet ? 8 : 4;
       const admissionChance = Math.round(
         Math.min(98, Math.max(20,
-          examFit * 0.6 + budgetFit * 20 + locationMatch * 10 + courseMatch * 8 + casteBonus
+          examFit * 0.62 + budgetFit * 16 + locationMatch * 10 + courseMatch * 8 + casteBonus
         ))
       );
+      const cutoffTrend = usesEamcet
+        ? estimatedEamcetRank <= (college.eamcetRank || 0) ? "Within expected EAMCET rank range" : "Above expected EAMCET rank range"
+        : jeePercentile >= (college.cutoff || 0) ? "Within expected JEE percentile range" : "Below expected JEE percentile range";
 
       return {
         ...college,
         admissionChance,
-        cutoffTrend: scoreValue >= college.cutoff ? "Within expected cutoff" : "Above expected cutoff"
+        cutoffTrend,
+        userExamMetric: usesEamcet ? `Rank used: ${estimatedEamcetRank}` : `Percentile used: ${jeePercentile}`,
+        model: usesEamcet ? "weighted_eamcet_rank_match" : "weighted_jee_percentile_match"
       };
     })
-    .sort((a, b) => b.admissionChance - a.admissionChance);
+    .sort((a, b) => b.admissionChance - a.admissionChance)
+    .slice(0, 50);
 
-  res.json({ recommendations });
+  res.json({
+    recommendations,
+    source: "Curated from NIRF 2024 engineering rankings plus Hyderabad/Telangana EAMCET-style cutoff catalog",
+    algorithm: usesEamcet ? "Weighted rank-fit scoring using EAMCET rank/marks estimate" : "Weighted percentile-fit scoring using JEE percentile"
+  });
 });
 
 router.get("/report", requireAuth, async (req, res) => {
@@ -599,6 +730,99 @@ function buildChatSystemPrompt(context) {
   return `You are an AI career coach for a student using a career advisory platform. The user is currently aligned with the career path ${context.career} and should focus on skills like ${skills}. Provide concise, practical advice for career planning, study strategies, project ideas, interview preparation, or resume improvement. Keep the response friendly and actionable.`;
 }
 
+function buildLocalChatAnswer(userInput, context) {
+  const text = userInput.toLowerCase();
+  const career = context.career;
+  const skills = context.catalog.skills.slice(0, 5);
+  const roadmap = context.catalog.roadmap.slice(0, 4);
+  const resumeMissing = context.latestResume?.analysis?.missingSkills || [];
+  const testSkills = context.latestTest?.recommendation?.skillsToBuild || [];
+  const focusSkills = [...new Set([...resumeMissing, ...testSkills, ...skills])].slice(0, 5);
+  const skillPlans = {
+    html: "Learn HTML in this order: document structure, headings/paragraphs, links/images, lists/tables, forms, semantic tags like header/nav/main/section/footer, then accessibility basics. Practice by building a personal profile page, a resume page, and a simple landing page.",
+    css: "Learn CSS in this order: selectors, box model, colors/fonts, flexbox, grid, responsive media queries, transitions, then clean component styling. Practice by styling your HTML profile page for mobile and desktop.",
+    javascript: "Learn JavaScript in this order: variables, functions, arrays, objects, DOM manipulation, events, fetch API, promises/async-await, then small projects. Build a calculator, quiz app, and API-based weather/search app.",
+    react: "Learn React after basic JavaScript. Start with components, props, state, events, forms, conditional rendering, lists, useEffect, API calls, routing, then project structure. Build a todo app, dashboard page, and portfolio project.",
+    node: "Learn Node.js after JavaScript basics. Start with npm, modules, Express routes, middleware, REST APIs, MongoDB connection, authentication, and error handling. Build a CRUD API and connect it to React.",
+    mongodb: "Learn MongoDB with collections, documents, CRUD queries, schemas with Mongoose, relationships by id, indexes, and aggregation basics. Practice by storing users, tests, resume analyses, and recommendations."
+  };
+  const mentionedSkill = Object.keys(skillPlans).find((skill) => text.includes(skill));
+  const roleMatch = Object.keys(careerCatalog).find((role) => text.includes(role.toLowerCase()));
+
+  if (roleMatch && (text.includes("become") || text.includes("how") || text.includes("roadmap") || text.includes("learn"))) {
+    const rolePlan = careerCatalog[roleMatch];
+    return [
+      `To become a ${roleMatch}, follow this path:`,
+      rolePlan.roadmap.map((step, index) => `${index + 1}. ${step}`).join(" "),
+      `Focus skills: ${rolePlan.skills.join(", ")}.`,
+      "Build at least two proof projects and add them to your resume with GitHub or deployed links."
+    ].join(" ");
+  }
+
+  if (/^(hi|hello|hey|how are you|good morning|good evening|good afternoon)\b/.test(text)) {
+    return "I’m doing well and ready to help. Tell me what you want to work on: learning a skill, building a project, improving your resume, preparing for interviews, or choosing the next career step.";
+  }
+
+  if (text.includes("thank")) {
+    return "You’re welcome. Keep the next step small and visible: learn one concept, practice it once, and add proof of it to your portfolio or resume.";
+  }
+
+  if (mentionedSkill && (text.includes("learn") || text.includes("study") || text.includes("start") || text.includes("how"))) {
+    return skillPlans[mentionedSkill];
+  }
+
+  if (text.includes("how should i follow") || text.includes("how to follow") || text.includes("what should i do") || text.includes("next step")) {
+    return [
+      `Follow this simple weekly plan for ${career}:`,
+      `1. Pick one skill: ${focusSkills[0] || skills[0]}.`,
+      "2. Watch one beginner course/video and take short notes.",
+      "3. Practice the same concept in a small task the same day.",
+      "4. Build one mini project by the weekend.",
+      "5. Add the project link and 2-3 bullet points to your resume.",
+      `Then repeat with ${focusSkills.slice(1, 4).join(", ")}.`
+    ].join(" ");
+  }
+
+  if (text.includes("resume") || text.includes("ats") || text.includes("cv")) {
+    return [
+      `For a ${career} resume, keep the first half page very strong.`,
+      `Add these skills with proof: ${focusSkills.join(", ")}.`,
+      "For each project, write: problem solved, tech stack, your contribution, measurable result, and GitHub/deployed link.",
+      "Use simple ATS-friendly headings: Summary, Skills, Projects, Education, Experience, Certifications."
+    ].join(" ");
+  }
+
+  if (text.includes("project") || text.includes("portfolio")) {
+    return [
+      `Build 2-3 portfolio projects for ${career}.`,
+      `Start with a project using ${skills.slice(0, 3).join(", ")}.`,
+      "Make every project public on GitHub, add screenshots, and write a short README explaining features, setup, and learning outcome."
+    ].join(" ");
+  }
+
+  if (text.includes("interview") || text.includes("placement")) {
+    return [
+      `For ${career} interviews, prepare fundamentals plus project explanation.`,
+      `Revise these areas first: ${focusSkills.join(", ")}.`,
+      "Practice one technical question, one project explanation, and one HR answer daily for the next two weeks."
+    ].join(" ");
+  }
+
+  if (text.includes("roadmap") || text.includes("learn") || text.includes("study")) {
+    return [
+      `Your current roadmap for ${career}:`,
+      roadmap.map((step, index) => `${index + 1}. ${step}`).join(" "),
+      `After that, strengthen ${focusSkills.slice(0, 3).join(", ")} with one mini project. If you ask about a specific skill like HTML, CSS, JavaScript, React, or Node, I can give a step-by-step plan.`
+    ].join(" ");
+  }
+
+  return [
+    "I can help with that, but I need one specific direction.",
+    `You can ask: "How should I learn ${skills[0] || "HTML"}?", "Suggest a project", "Improve my resume", "Prepare me for interview", or "Give me a weekly plan".`,
+    `Your current career context is ${career}, so I’ll tailor answers around that path.`
+  ].join(" ");
+}
+
 router.post("/chat", requireAuth, async (req, res) => {
   const userInput = String(req.body.text || "").trim();
   const context = await getContext(req.user.id);
@@ -607,35 +831,49 @@ router.post("/chat", requireAuth, async (req, res) => {
     return res.status(400).json({ answer: "Please send a non-empty chat message." });
   }
 
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(503).json({
-      answer: "Career chat is not available because OPENAI_API_KEY is not configured on the server."
+  if (!process.env.GEMINI_API_KEY) {
+    return res.json({
+      answer: buildLocalChatAnswer(userInput, context),
+      source: "local"
     });
   }
 
   try {
+    const systemPrompt = buildChatSystemPrompt(context);
     const payload = {
-      model: "gpt-3.5-turbo",
-      temperature: 0.75,
-      messages: [
-        { role: "system", content: buildChatSystemPrompt(context) },
-        { role: "user", content: userInput }
-      ]
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { text: systemPrompt },
+            { text: userInput }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.75
+      }
     };
 
-    const response = await axios.post("https://api.openai.com/v1/chat/completions", payload, {
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      timeout: 15000
-    });
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        timeout: 15000
+      }
+    );
 
-    const answer = response.data?.choices?.[0]?.message?.content?.trim() || "I couldn't generate a response right now. Please try again.";
+    const answer = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "I couldn't generate a response right now. Please try again.";
     res.json({ answer });
   } catch (error) {
-    console.error("OpenAI chat error", error?.response?.data || error.message || error);
-    res.status(500).json({ answer: "The career chat service failed. Please try again later." });
+    console.error("Gemini chat error", error?.response?.data || error.message || error);
+    res.json({
+      answer: buildLocalChatAnswer(userInput, context),
+      source: "local-fallback"
+    });
   }
 });
 

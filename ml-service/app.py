@@ -77,6 +77,16 @@ TREE_FEATURES = [
     "Stress_Handling",
     "Research_Interest",
     "Social_Service_Interest",
+    "Cybersecurity_Interest",
+    "Blockchain_Interest",
+    "Cloud_Computing",
+    "DevOps_Interest",
+    "Mobile_Development",
+    "UI_UX_Design",
+    "Product_Management",
+    "Digital_Marketing",
+    "Testing_QA",
+    "Database_Management",
 ]
 
 

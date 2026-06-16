@@ -25,7 +25,7 @@ import {
   UserRound
 } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { api } from "../api";
+import { API_ORIGIN, api } from "../api";
 import ResumePanel from "./ResumePanel";
 import ResultPanel from "./ResultPanel";
 const sidebarFeatures = [
@@ -80,7 +80,17 @@ const profileFeatureFields = [
   ["Attention_To_Detail", "Attention To Detail", 1, 10],
   ["Stress_Handling", "Stress Handling", 1, 10],
   ["Research_Interest", "Research Interest", 1, 10],
-  ["Social_Service_Interest", "Social Service Interest", 1, 10]
+  ["Social_Service_Interest", "Social Service Interest", 1, 10],
+  ["Cybersecurity_Interest", "Cybersecurity Interest", 1, 10],
+  ["Blockchain_Interest", "Blockchain Interest", 1, 10],
+  ["Cloud_Computing", "Cloud Computing", 1, 10],
+  ["DevOps_Interest", "DevOps Interest", 1, 10],
+  ["Mobile_Development", "Mobile Development", 1, 10],
+  ["UI_UX_Design", "UI/UX Design", 1, 10],
+  ["Product_Management", "Product Management", 1, 10],
+  ["Digital_Marketing", "Digital Marketing", 1, 10],
+  ["Testing_QA", "Testing / QA", 1, 10],
+  ["Database_Management", "Database Management", 1, 10]
 ];
 
 const defaultProfileFeatures = Object.fromEntries(
@@ -188,6 +198,11 @@ const featureSections = [
     keys: ["Coding_Skill", "Problem_Solving", "Data_Analysis", "Web_Development", "AI_Interest"]
   },
   {
+    title: "Market Role Skills",
+    helper: "Rate modern job-market skills so the model can recommend cybersecurity, blockchain, cloud, DevOps, mobile, product, and related careers.",
+    keys: ["Cybersecurity_Interest", "Blockchain_Interest", "Cloud_Computing", "DevOps_Interest", "Mobile_Development", "UI_UX_Design", "Product_Management", "Digital_Marketing", "Testing_QA", "Database_Management"]
+  },
+  {
     title: "Communication & Team Skills",
     helper: "Rate your soft skills based on classroom, project, or activity experience.",
     keys: ["Communication", "Leadership", "Teamwork", "Public_Speaking"]
@@ -241,6 +256,10 @@ const profilingQuestions = [
   { id: "social_1", feature: "Social_Service_Interest", question: "A career focused on public impact requires:", options: [["Empathy and service mindset", 10], ["Ignoring people", 1], ["No ethics", 1], ["Avoiding communication", 2]] },
   { id: "math_5", feature: "Math_Interest", question: "A shopkeeper gives 20% discount on an item marked at 2500. Selling price is:", options: [["1800", 55], ["2000", 100], ["2100", 50], ["2300", 40]] },
   { id: "math_6", feature: "Math_Interest", question: "If the probability of an event is 0.25, the probability that it does not occur is:", options: [["0.25", 45], ["0.50", 50], ["0.75", 100], ["1.25", 35]] },
+  { id: "aptitude_1", feature: "Problem_Solving", question: "A train covers 180 km in 3 hours. What is its average speed?", options: [["45 km/h", 4], ["50 km/h", 5], ["60 km/h", 10], ["90 km/h", 3]] },
+  { id: "aptitude_2", feature: "Math_Interest", question: "Simple interest on 5000 at 10% per year for 2 years is:", options: [["500", 4], ["750", 5], ["1000", 10], ["1500", 3]] },
+  { id: "logic_1", feature: "Analytical_Thinking", question: "Find the odd one out: 2, 4, 8, 16, 31, 64", options: [["8", 3], ["16", 3], ["31", 10], ["64", 3]] },
+  { id: "logic_2", feature: "Problem_Solving", question: "If A is taller than B and B is taller than C, who is tallest?", options: [["A", 10], ["B", 4], ["C", 2], ["Cannot say", 3]] },
   { id: "physics_4", feature: "Physics_Interest", question: "According to Ohm's law, if voltage doubles and resistance stays same, current:", options: [["Halves", 45], ["Doubles", 100], ["Becomes zero", 35], ["Stays same", 50]] },
   { id: "physics_5", feature: "Physics_Interest", question: "A body moving with constant velocity has acceleration:", options: [["Zero", 100], ["Increasing", 40], ["Negative always", 45], ["Equal to speed", 35]] },
   { id: "chemistry_3", feature: "Chemistry_Interest", question: "Which bond involves sharing of electron pairs?", options: [["Ionic bond", 55], ["Covalent bond", 100], ["Metallic sound", 35], ["Gravity bond", 30]] },
@@ -265,7 +284,19 @@ const profilingQuestions = [
   { id: "detail_2", feature: "Attention_To_Detail", question: "A small decimal error in a finance report shows weak:", options: [["Attention to detail", 10], ["Public speaking", 2], ["Graphic design only", 2], ["Team size", 1]] },
   { id: "stress_2", feature: "Stress_Handling", question: "Under exam pressure, the best strategy is:", options: [["Prioritize known questions first", 10], ["Spend all time on one unknown", 2], ["Stop reading", 1], ["Randomly mark all", 1]] },
   { id: "research_2", feature: "Research_Interest", question: "A good literature review should:", options: [["Compare multiple credible sources", 10], ["Use one random post", 2], ["Avoid evidence", 1], ["Only copy text", 1]] },
-  { id: "social_2", feature: "Social_Service_Interest", question: "Which project best reflects social service interest?", options: [["Accessibility tool for students", 10], ["Private game score only", 3], ["Personal wallpaper app", 2], ["Random calculator with no user need", 2]] }
+  { id: "social_2", feature: "Social_Service_Interest", question: "Which project best reflects social service interest?", options: [["Accessibility tool for students", 10], ["Private game score only", 3], ["Personal wallpaper app", 2], ["Random calculator with no user need", 2]] },
+  { id: "cyber_1", feature: "Cybersecurity_Interest", question: "Which practice helps prevent unauthorized account access?", options: [["Weak reusable passwords", 1], ["Multi-factor authentication", 10], ["Sharing OTPs", 1], ["Disabling updates", 2]] },
+  { id: "cyber_2", feature: "Cybersecurity_Interest", question: "OWASP mainly relates to:", options: [["Web application security risks", 10], ["Graphic design", 2], ["Video editing", 1], ["Spreadsheet formulas only", 2]] },
+  { id: "blockchain_1", feature: "Blockchain_Interest", question: "A blockchain is best described as:", options: [["A distributed immutable ledger", 10], ["A normal image file", 1], ["A CSS library", 1], ["A laptop battery", 1]] },
+  { id: "blockchain_2", feature: "Blockchain_Interest", question: "Smart contracts are programs that usually run on:", options: [["Blockchain networks", 10], ["Only PowerPoint", 1], ["A printer driver", 1], ["Keyboard firmware", 2]] },
+  { id: "cloud_1", feature: "Cloud_Computing", question: "Cloud computing mainly provides:", options: [["On-demand computing resources", 10], ["Only offline notebooks", 1], ["Manual paperwork", 1], ["Cable management", 2]] },
+  { id: "devops_1", feature: "DevOps_Interest", question: "CI/CD pipelines are used to:", options: [["Automate build, test, and deployment", 10], ["Draw icons only", 1], ["Replace requirements", 2], ["Format resumes", 1]] },
+  { id: "mobile_1", feature: "Mobile_Development", question: "Flutter and React Native are commonly used for:", options: [["Mobile app development", 10], ["Database indexing only", 2], ["Network cabling", 1], ["Video compression only", 2]] },
+  { id: "uiux_1", feature: "UI_UX_Design", question: "A wireframe is used to:", options: [["Plan screen layout and user flow", 10], ["Encrypt passwords", 1], ["Train a model only", 2], ["Compile C code", 1]] },
+  { id: "product_1", feature: "Product_Management", question: "A product manager mainly balances:", options: [["User needs, business goals, and feasibility", 10], ["Only font colors", 2], ["Only server logs", 2], ["Only exam marks", 1]] },
+  { id: "marketing_1", feature: "Digital_Marketing", question: "SEO is used to improve:", options: [["Search visibility", 10], ["Battery life", 1], ["Compiler speed", 2], ["Password strength only", 2]] },
+  { id: "qa_1", feature: "Testing_QA", question: "Regression testing checks whether:", options: [["Old features still work after changes", 10], ["Only colors changed", 2], ["The logo is large", 1], ["The code is deleted", 1]] },
+  { id: "db_1", feature: "Database_Management", question: "A database index is mainly used to:", options: [["Speed up data lookup", 10], ["Create UI icons", 1], ["Charge a phone", 1], ["Replace backups", 2]] }
 ];
 
 const profileFeatureLabels = Object.fromEntries(profileFeatureFields.map(([key, label]) => [key, label]));
@@ -295,6 +326,11 @@ const profilingSubjectGroups = [
     title: "Section 5: Science & Work Style",
     description: "Science knowledge, leadership, creativity, stress handling, and service mindset.",
     features: ["Physics_Interest", "Chemistry_Interest", "Biology_Interest", "Leadership", "Creativity", "Stress_Handling", "Social_Service_Interest"]
+  },
+  {
+    title: "Section 6: Emerging Technologies & Market Skills",
+    description: "Cybersecurity, blockchain, cloud, DevOps, mobile, UI/UX, product, marketing, QA, and database interests.",
+    features: ["Cybersecurity_Interest", "Blockchain_Interest", "Cloud_Computing", "DevOps_Interest", "Mobile_Development", "UI_UX_Design", "Product_Management", "Digital_Marketing", "Testing_QA", "Database_Management"]
   }
 ];
 
@@ -366,6 +402,54 @@ function makeLocalRecommendation(features) {
       path: ["Business process basics", "SQL reports", "Case study portfolio"]
     },
     {
+      career: "Cybersecurity Analyst",
+      score: profile.Cybersecurity_Interest + profile.Attention_To_Detail + profile.Problem_Solving + profile.Stress_Handling,
+      skills: ["Networking", "Linux", "OWASP", "SIEM"],
+      path: ["Networking basics", "Linux practice", "OWASP labs", "Security report portfolio"]
+    },
+    {
+      career: "Blockchain Developer",
+      score: profile.Blockchain_Interest + profile.Coding_Skill + profile.Problem_Solving + profile.Database_Management,
+      skills: ["Solidity", "Smart Contracts", "Web3", "Security"],
+      path: ["Blockchain basics", "Solidity practice", "Smart contract project", "Web3 deployment"]
+    },
+    {
+      career: "Cloud Engineer",
+      score: profile.Cloud_Computing + profile.DevOps_Interest + profile.Problem_Solving + profile.Coding_Skill,
+      skills: ["AWS", "Linux", "Docker", "Monitoring"],
+      path: ["Linux and networking", "Cloud fundamentals", "Docker deployment", "Cloud portfolio project"]
+    },
+    {
+      career: "DevOps Engineer",
+      score: profile.DevOps_Interest + profile.Cloud_Computing + profile.Testing_QA + profile.Stress_Handling,
+      skills: ["CI/CD", "Docker", "Kubernetes", "Automation"],
+      path: ["Git and Linux", "CI/CD pipeline", "Docker containers", "Kubernetes basics"]
+    },
+    {
+      career: "Mobile App Developer",
+      score: profile.Mobile_Development + profile.Coding_Skill + profile.UI_UX_Design + profile.Creativity,
+      skills: ["Flutter", "React Native", "APIs", "Mobile UI"],
+      path: ["Mobile UI basics", "API integration", "Local storage", "Publish demo app"]
+    },
+    {
+      career: "UI/UX Designer",
+      score: profile.UI_UX_Design + profile.Creativity + profile.Communication + profile.Research_Interest,
+      skills: ["Figma", "Wireframes", "User Research", "Prototyping"],
+      path: ["Design basics", "Wireframes", "User research", "Portfolio case study"]
+    },
+    {
+      career: "Product Manager",
+      score: profile.Product_Management + profile.Leadership + profile.Communication + profile.Data_Analysis,
+      skills: ["Roadmapping", "User Research", "Analytics", "PRD Writing"],
+      path: ["Product thinking", "User research", "Analytics", "Case study portfolio"]
+    },
+    {
+      career: "QA Automation Engineer",
+      score: profile.Testing_QA + profile.Attention_To_Detail + profile.Coding_Skill + profile.Problem_Solving,
+      skills: ["Manual Testing", "Selenium", "API Testing", "Bug Reports"],
+      path: ["Testing basics", "Test cases", "Automation scripts", "API testing"]
+    },
+    {
       career: "Healthcare / Biology Track",
       score: profile.Biology_Interest + profile.Chemistry_Interest + profile.Social_Service_Interest + profile.Research_Interest,
       skills: ["Biology", "Research", "Communication", "Attention to Detail"],
@@ -427,6 +511,16 @@ function featuresFromSkillList(skills = []) {
   boosted.Attention_To_Detail = hasAny(["testing", "debugging", "quality", "detail"]) ? 8 : 5;
   boosted.Research_Interest = hasAny(["research", "paper", "experiment", "study"]) ? 8 : 4;
   boosted.Social_Service_Interest = hasAny(["social", "ngo", "volunteer", "community"]) ? 8 : 3;
+  boosted.Cybersecurity_Interest = hasAny(["cyber", "security", "owasp", "network", "linux", "siem"]) ? 9 : 3;
+  boosted.Blockchain_Interest = hasAny(["blockchain", "web3", "solidity", "smart contract", "crypto"]) ? 9 : 3;
+  boosted.Cloud_Computing = hasAny(["cloud", "aws", "azure", "gcp", "docker", "deploy"]) ? 9 : 3;
+  boosted.DevOps_Interest = hasAny(["devops", "ci/cd", "pipeline", "docker", "kubernetes", "jenkins"]) ? 9 : 3;
+  boosted.Mobile_Development = hasAny(["mobile", "flutter", "react native", "android", "ios"]) ? 9 : 3;
+  boosted.UI_UX_Design = hasAny(["ui", "ux", "figma", "wireframe", "prototype"]) ? 9 : 3;
+  boosted.Product_Management = hasAny(["product", "roadmap", "prd", "user research", "analytics"]) ? 9 : 3;
+  boosted.Digital_Marketing = hasAny(["seo", "marketing", "ads", "campaign", "content"]) ? 9 : 3;
+  boosted.Testing_QA = hasAny(["testing", "qa", "selenium", "automation", "bug"]) ? 9 : 3;
+  boosted.Database_Management = hasAny(["database", "sql", "mongodb", "mysql", "postgres", "indexing"]) ? 9 : 3;
 
   return normalizeProfileFeatures(boosted);
 }
@@ -959,6 +1053,8 @@ function CollegeRecommendationPanel() {
   const [filters, setFilters] = useState({
     examType: "JEE",
     examScore: 75,
+    eamcetMarks: 80,
+    eamcetRank: "",
     budget: 200000,
     location: "",
     course: "CSE",
@@ -966,13 +1062,17 @@ function CollegeRecommendationPanel() {
   });
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
 
   function updateFilter(key, value) {
     setFilters((prev) => ({ ...prev, [key]: value }));
   }
 
+  const isEamcet = filters.examType === "EAMCET TS";
+
   async function searchColleges() {
     setLoading(true);
+    setSearched(true);
     const data = await api("/advisor/college-recommend", {
       method: "POST",
       body: JSON.stringify(filters)
@@ -981,17 +1081,37 @@ function CollegeRecommendationPanel() {
     setLoading(false);
   }
 
+  useEffect(() => {
+    searchColleges();
+  }, []);
+
   return (
     <section className="advisor-card college-panel">
       <div className="section-title">
         <div>
           <p className="eyebrow">College recommendation</p>
           <h2>Find your best-fit college</h2>
+          <p>Compare admission chance, fees, placement, cutoff trend, and course fit using your entrance profile.</p>
         </div>
         <Map size={24} />
       </div>
 
-      <div className="filter-grid">
+      <div className="college-intro-grid">
+        <div>
+          <strong>Admission probability model</strong>
+          <p>Uses entrance score, cutoff fit, budget, course interest, location, and category.</p>
+        </div>
+        <div>
+          <strong>{recommendations.length || "--"}</strong>
+          <span>matched colleges</span>
+        </div>
+        <div>
+          <strong>{filters.examType}</strong>
+          <span>selected exam</span>
+        </div>
+      </div>
+
+      <div className="filter-grid college-filter-grid">
         <label>
           Exam type
           <select value={filters.examType} onChange={(event) => updateFilter("examType", event.target.value)}>
@@ -1005,46 +1125,39 @@ function CollegeRecommendationPanel() {
             ))}
           </select>
         </label>
+        {isEamcet ? (
+          <>
+            <label>
+              EAMCET marks out of 160
+              <input type="number" min="0" max="160" step="1" value={filters.eamcetMarks} onChange={(event) => updateFilter("eamcetMarks", Number(event.target.value))} />
+            </label>
+            <label>
+              EAMCET rank optional
+              <input type="number" min="0" step="1" value={filters.eamcetRank} onChange={(event) => updateFilter("eamcetRank", event.target.value)} placeholder="If known, enter rank" />
+            </label>
+          </>
+        ) : (
+          <label>
+            JEE percentile
+            <input type="number" min="0" max="100" step="0.01" value={filters.examScore} onChange={(event) => updateFilter("examScore", Number(event.target.value))} />
+          </label>
+        )}
         <label>
-          Exam score
-          <input
-            type="number"
-            min="0"
-            max="100"
-            step="1"
-            value={filters.examScore}
-            onChange={(event) => updateFilter("examScore", Number(event.target.value))}
-          />
+          Annual budget
+          <input type="number" min="0" step="1000" value={filters.budget} onChange={(event) => updateFilter("budget", Number(event.target.value))} />
         </label>
         <label>
-          Budget
-          <input
-            type="number"
-            min="0"
-            step="1000"
-            value={filters.budget}
-            onChange={(event) => updateFilter("budget", Number(event.target.value))}
-          />
+          Preferred location
+          <input value={filters.location} onChange={(event) => updateFilter("location", event.target.value)} placeholder="Hyderabad, Bengaluru, Pune..." />
         </label>
         <label>
-          Location
-          <input
-            value={filters.location}
-            onChange={(event) => updateFilter("location", event.target.value)}
-            placeholder="City or region"
-          />
-        </label>
-        <label>
-          Course
-          <input
-            value={filters.course}
-            onChange={(event) => updateFilter("course", event.target.value)}
-          />
+          Course interest
+          <input value={filters.course} onChange={(event) => updateFilter("course", event.target.value)} placeholder="CSE, AI, ECE, Civil..." />
         </label>
         <label>
           Category
           <select value={filters.category} onChange={(event) => updateFilter("category", event.target.value)}>
-            {['General', 'OBC', 'SC', 'ST'].map((category) => (
+            {["General", "OBC", "SC", "ST"].map((category) => (
               <option key={category} value={category}>{category}</option>
             ))}
           </select>
@@ -1055,18 +1168,31 @@ function CollegeRecommendationPanel() {
         {loading ? "Finding colleges..." : "Find colleges"}
       </button>
 
-      <div className="recommendation-list">
+      <div className="college-results-grid">
         {recommendations.length === 0 ? (
-          <p>No colleges yet. Run the search to see matched colleges.</p>
+          <div className="empty-state">
+            <p>{searched ? "No colleges matched these filters. Increase budget, clear location, or use a broader course name." : "Run the search to see matched colleges."}</p>
+          </div>
         ) : (
           recommendations.map((college) => (
-            <div className="job-row" key={`${college.name}-${college.location}`}>
-              <div>
-                <strong>{college.name}</strong>
-                <small>{college.location} • {college.course} • cutoff {college.cutoff}</small>
+            <article className="college-card" key={`${college.name}-${college.location}`}>
+              <div className="college-card-head">
+                <div>
+                  <strong>{college.name}</strong>
+                  <small>{college.location} | {college.course}</small>
+                </div>
+                <span>{college.admissionChance}%</span>
               </div>
-              <span>{college.admissionChance}%</span>
-            </div>
+              <div className="college-meter"><span style={{ width: `${college.admissionChance}%` }} /></div>
+              <div className="college-stat-grid">
+                <div><small>Fees</small><strong>₹{Number(college.fees).toLocaleString("en-IN")}</strong></div>
+                <div><small>Placement</small><strong>{college.placement}</strong></div>
+                <div><small>Cutoff</small><strong>{college.cutoff}</strong></div>
+                <div><small>Rating</small><strong>{college.rating}/5</strong></div>
+              </div>
+              <p>{college.cutoffTrend}. {college.userExamMetric}. Accepted exams: {college.acceptedExams?.join(", ")}.</p>
+              <small>Dataset: {college.source}</small>
+            </article>
           ))
         )}
       </div>
@@ -1088,13 +1214,26 @@ function RoadmapPanel() {
   return (
     <section className="advisor-card roadmap-panel">
       <p className="eyebrow">Learning roadmap</p>
-      <h2>Next 30 days</h2>
-      {steps.map((step, index) => (
-        <div className="road-step" key={step}>
-          <span>{index + 1}</span>
-          <p>{step}</p>
-        </div>
-      ))}
+      <h2>{data.career ? `${data.career} roadmap` : "Next 30 days"}</h2>
+      <div className="roadmap-progress-card">
+        <strong>{data.progress || 0}% complete</strong>
+        <div className="progress"><span style={{ width: `${data.progress || 0}%` }} /></div>
+      </div>
+      <div className="guidance-flow visual-flowchart roadmap-flow">
+        {steps.map((step, index) => (
+          <React.Fragment key={step}>
+            <div className="flow-step">
+              <div className="flow-step-number">{index + 1}</div>
+              <div className="flow-step-body">
+                <small>{data.roadmap?.[index]?.status || "pending"}</small>
+                <strong>{step}</strong>
+                <p>{index === steps.length - 1 ? "Create proof and add it to your profile." : "Complete this stage before moving ahead."}</p>
+              </div>
+            </div>
+            {index < steps.length - 1 && <div className="flow-connector">&rarr;</div>}
+          </React.Fragment>
+        ))}
+      </div>
     </section>
   );
 }
@@ -1121,17 +1260,30 @@ function GuidancePanel() {
       </div>
 
       {data?.learningPath?.length ? (
-        <div className="guidance-flow">
-          {data.learningPath.map((step, index) => (
-            <div className="flow-step" key={step}>
-              <div className="flow-step-number">{index + 1}</div>
-              <div className="flow-step-body">
-                <strong>{step}</strong>
-              </div>
-              {index < data.learningPath.length - 1 && <div className="flow-connector">→</div>}
+        <>
+          <div className="guidance-flow-header">
+            <div>
+              <p className="eyebrow">Visual roadmap</p>
+              <h3>{data.career || "Career"} learning flow</h3>
             </div>
-          ))}
-        </div>
+            <span>{data.learningPath.length} stages</span>
+          </div>
+          <div className="guidance-flow visual-flowchart">
+            {data.learningPath.map((step, index) => (
+              <React.Fragment key={step}>
+                <div className="flow-step">
+                  <div className="flow-step-number">{index + 1}</div>
+                  <div className="flow-step-body">
+                    <small>{index === 0 ? "Foundation" : index === data.learningPath.length - 1 ? "Portfolio" : "Skill stage"}</small>
+                    <strong>{step}</strong>
+                    <p>{index === 0 ? "Start here and complete the core basics." : "Practice this stage with one task or mini project."}</p>
+                  </div>
+                </div>
+                {index < data.learningPath.length - 1 && <div className="flow-connector">&rarr;</div>}
+              </React.Fragment>
+            ))}
+          </div>
+        </>
       ) : null}
 
       {data?.learningResources?.length ? (
@@ -1252,23 +1404,97 @@ function SkillDevelopmentPanel() {
 
 function MentorPanel() {
   const [data, setData] = useState(null);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [booked, setBooked] = useState(false);
 
   useEffect(() => {
     api("/advisor/mentor").then(setData);
   }, []);
 
+  async function askExpert(prompt = question) {
+    const text = prompt.trim();
+    if (!text || loading) return;
+    setQuestion(text);
+    setAnswer("");
+    setLoading(true);
+    try {
+      const response = await api("/advisor/chat", {
+        method: "POST",
+        body: JSON.stringify({ text: `Act as an expert career mentor. ${text}` })
+      });
+      setAnswer(response.answer);
+    } catch (err) {
+      setAnswer(err.message || "Unable to get expert guidance right now.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <section className="advisor-card roadmap-panel">
-      <p className="eyebrow">Expert guidance</p>
-      <h2>Mentor Support</h2>
+    <section className="advisor-card mentor-panel">
+      <div className="section-title">
+        <div>
+          <p className="eyebrow">Expert guidance</p>
+          <h2>{data?.career || "Career"} Mentor Support</h2>
+          <p>Ask a focused question, book a mentor slot, and prepare with a clear session plan.</p>
+        </div>
+        <UserRound size={28} />
+      </div>
+      <div className="mentor-grid">
+        {(data?.mentors || []).map((mentor) => (
+          <article className="mentor-card" key={mentor.name}>
+            <div>
+              <strong>{mentor.name}</strong>
+              <small>{mentor.focus}</small>
+            </div>
+            <span>{mentor.match}% match</span>
+            <p>{mentor.availability}</p>
+          </article>
+        ))}
+      </div>
       {(data?.mentorTips || ["Ask for resume review", "Prepare interview answers", "Discuss your roadmap"]).map((tip, index) => (
         <div className="road-step" key={tip}>
           <span>{index + 1}</span>
           <p>{tip}</p>
         </div>
       ))}
-      <div className="chips">
-        {(data?.chatPrompts || []).map((prompt) => <span key={prompt}>{prompt}</span>)}
+      <div className="mentor-actions-grid">
+        <div className="mentor-box">
+          <h3>Quick expert prompts</h3>
+          <div className="chips mentor-prompt-chips">
+            {(data?.chatPrompts || []).map((prompt) => (
+              <button key={prompt} type="button" onClick={() => askExpert(prompt)}>{prompt}</button>
+            ))}
+          </div>
+          <textarea
+            value={question}
+            onChange={(event) => setQuestion(event.target.value)}
+            placeholder="Example: How should I prepare for interviews in my target career?"
+          />
+          <button className="primary" onClick={() => askExpert()} disabled={loading || !question.trim()}>
+            {loading ? "Getting guidance..." : "Get Expert Answer"}
+          </button>
+          {answer && <div className="expert-answer"><strong>Expert answer</strong><p>{answer}</p></div>}
+        </div>
+        <div className="mentor-box">
+          <h3>Book guidance slot</h3>
+          <select value={selectedSlot} onChange={(event) => setSelectedSlot(event.target.value)}>
+            <option value="">Select a slot</option>
+            {(data?.bookingSlots || []).map((slot) => <option key={slot}>{slot}</option>)}
+          </select>
+          <button className="secondary" disabled={!selectedSlot} onClick={() => setBooked(true)}>Book Appointment</button>
+          {booked && <p className="success">Appointment request saved for {selectedSlot}. Prepare your questions before the call.</p>}
+          <h3>Session plan</h3>
+          {(data?.sessionPlan || []).map((tip, index) => (
+            <div className="road-step" key={tip}>
+              <span>{index + 1}</span>
+              <p>{tip}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -1299,31 +1525,56 @@ function ProgressPanel() {
 }
 
 function ProfilePanel({ user }) {
-  const [profile, setProfile] = useState(null);
-  const [targetRole, setTargetRole] = useState("");
+  const [report, setReport] = useState(null);
 
   useEffect(() => {
-    api("/advisor/profile").then((data) => {
-      setProfile(data.profile);
-      setTargetRole(data.profile.targetRole || "");
-    });
+    api("/advisor/report").then(setReport);
   }, []);
 
-  async function saveProfile() {
-    const data = await api("/advisor/profile", {
-      method: "PUT",
-      body: JSON.stringify({ targetRole })
-    });
-    setProfile(data.profile);
-  }
+  const career = report?.careerPrediction?.career || "Not predicted yet";
+  const confidence = Math.round((report?.careerPrediction?.confidence || 0) * 100);
 
   return (
-    <section className="advisor-card skill-builder">
-      <p className="eyebrow">User profile management</p>
-      <h2>{user.name}</h2>
-      <p>{user.email || user.role || "Student"}</p>
-      <textarea value={targetRole} onChange={(event) => setTargetRole(event.target.value)} placeholder="Target role, interests, or career goal" />
-      <button className="primary" onClick={saveProfile}>{profile ? "Save Profile" : "Create Profile"}</button>
+    <section className="advisor-card profile-report-panel">
+      <div className="section-title">
+        <div>
+          <p className="eyebrow">Profile report</p>
+          <h2>{user.name}'s Career Report</h2>
+          <p>{user.email || "Student profile"} | Prediction, skills, roadmap, resume analysis, and export.</p>
+        </div>
+        <FileText size={28} />
+      </div>
+      <div className="report-hero">
+        <div><span>Predicted career</span><strong>{career}</strong></div>
+        <div><span>Confidence</span><strong>{confidence || 54}%</strong></div>
+        <div><span>Readiness</span><strong>{report?.readinessScore || 54}%</strong></div>
+      </div>
+      <div className="report-grid">
+        <article>
+          <h3>Recommended careers</h3>
+          {(report?.recommendedCareers || ["Complete the profiling test"]).map((item) => <p key={item}>{item}</p>)}
+        </article>
+        <article>
+          <h3>Skills to show</h3>
+          {(report?.skillAnalysis || ["Add skills or upload resume"]).map((item) => <p key={item}>{item}</p>)}
+        </article>
+        <article>
+          <h3>Learning roadmap</h3>
+          {(report?.learningRoadmap || ["Generate recommendation first"]).map((item, index) => <p key={item}>{index + 1}. {item}</p>)}
+        </article>
+        <article>
+          <h3>Resume analysis</h3>
+          {report?.resumeAnalysis ? (
+            <>
+              <p>ATS score: {report.resumeAnalysis.atsScore || "--"}%</p>
+              <p>Missing: {(report.resumeAnalysis.missingSkills || []).join(", ") || "No major gaps"}</p>
+            </>
+          ) : (
+            <p>Upload a resume to include NLP skill gap analysis.</p>
+          )}
+        </article>
+      </div>
+      <a className="primary report-download" href={`${API_ORIGIN}/api/advisor/report.csv`} target="_blank" rel="noreferrer">Download CSV Report</a>
     </section>
   );
 }
@@ -1362,6 +1613,59 @@ function AdvisorHome() {
   );
 }
 
+function DashboardRoadmapHub({ onSelect }) {
+  const cards = [
+    {
+      title: "Career Decision Roadmap",
+      tag: "After test",
+      steps: ["Finish profiling test", "Review top careers", "Open guidance path", "Build one proof project"],
+      action: "Start Profiling",
+      target: "career-profile"
+    },
+    {
+      title: "College Admission Plan",
+      tag: "Education",
+      steps: ["Enter exam score", "Compare admission chance", "Check fees and placement", "Shortlist 3 colleges"],
+      action: "Find Colleges",
+      target: "college"
+    },
+    {
+      title: "Resume Improvement Path",
+      tag: "NLP",
+      steps: ["Upload resume", "Select target role", "Fix missing skills", "Add certificates and project links"],
+      action: "Analyze Resume",
+      target: "resume"
+    }
+  ];
+
+  return (
+    <section className="dashboard-roadmap-hub">
+      <div className="section-title">
+        <div>
+          <p className="eyebrow">Next steps</p>
+          <h2>Roadmaps to continue from here</h2>
+        </div>
+        <Compass size={22} />
+      </div>
+      <div className="dashboard-roadmap-grid">
+        {cards.map((card) => (
+          <article className="dashboard-roadmap-card" key={card.title}>
+            <span>{card.tag}</span>
+            <h3>{card.title}</h3>
+            {card.steps.map((step, index) => (
+              <div className="road-step" key={step}>
+                <span>{index + 1}</span>
+                <p>{step}</p>
+              </div>
+            ))}
+            <button className="secondary" onClick={() => onSelect(card.target)}>{card.action}</button>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function MainOptions({ activeFeature, onSelect }) {
   return (
     <section className="practice-grid">
@@ -1384,7 +1688,7 @@ function Dashboard({ user, onLogout }) {
   const [activeFeature, setActiveFeature] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const latest = null;
-  const hideInsightRail = ["career-profile", "manual-profile", "resume"].includes(activeFeature);
+  const hideInsightRail = ["career-profile", "manual-profile", "resume", "college"].includes(activeFeature);
 
   return (
     <main className={`portal-shell ${sidebarOpen ? "" : "sidebar-closed"}`}>
@@ -1453,6 +1757,10 @@ function Dashboard({ user, onLogout }) {
 
         {activeFeature === "dashboard" && (
           <MainOptions activeFeature={activeFeature} onSelect={setActiveFeature} />
+        )}
+
+        {activeFeature === "dashboard" && (
+          <DashboardRoadmapHub onSelect={setActiveFeature} />
         )}
 
         <section className={`portal-content ${hideInsightRail ? "portal-content--wide" : ""}`}>

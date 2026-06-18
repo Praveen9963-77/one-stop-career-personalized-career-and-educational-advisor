@@ -3,6 +3,7 @@ import pickle
 from pathlib import Path
 from flask import Flask, jsonify, request
 import pandas as pd
+from knn_module import KNNRecommender, recommend_with_knn
 
 BASE_DIR = Path(__file__).resolve().parent
 JSON_MODEL_PATH = BASE_DIR / "model" / "career_model.json"
@@ -306,6 +307,36 @@ def analyze_resume_text(resume_text):
         "summary": f"Resume language currently aligns most closely with {matched_career}. Add evidence for the missing skills to improve fit.",
         "alternatives": [{"career": career, "score": round(value, 2)} for career, value, _missing in ranked[1:4]],
     }
+
+
+@app.post("/knn-recommend")
+def knn_recommend():
+    """
+    KNN-based career recommendation endpoint.
+    Takes user features and returns top recommendations with similar profiles and roadmaps.
+    """
+    try:
+        body = request.get_json(silent=True) or {}
+        user_features = body.get("features", {})
+        k = body.get("k", 5)
+        num_recommendations = body.get("num_recommendations", 3)
+        
+        if not user_features:
+            return jsonify({"message": "No user features provided"}), 400
+        
+        # Get KNN recommendations
+        result = recommend_with_knn(user_features, k=k, num_recommendations=num_recommendations)
+        
+        return jsonify(result), 200 if result.get("status") == "success" else 500
+    
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e),
+            "knn_recommendations": [],
+            "similar_profiles": [],
+            "roadmaps": {}
+        }), 500
 
 
 @app.get("/health")

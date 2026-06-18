@@ -59,6 +59,41 @@ const jobMatches = [
   { role: "Data Science Intern", company: "Byju's", location: "Bengaluru", fit: "83%", salary: "3-4 LPA", type: "Internship", skills: "Python, machine learning, data visualization" }
 ];
 
+const careerRoleMap = {
+  "Software Engineer": ["Full Stack Developer", "Backend Developer", "Frontend Developer", "DevOps Engineer"],
+  "Data Scientist": ["Data Science Intern", "Junior Data Scientist", "Analytics Engineer", "ML Researcher"],
+  "AI Engineer": ["AI Research Intern", "ML Engineer", "NLP Engineer", "Computer Vision Engineer"],
+  "Web Developer": ["Frontend Developer", "Full Stack Developer", "UI Engineer", "Web App Developer"],
+  "Business Analyst": ["Business Analyst Intern", "Product Analyst", "Operations Analyst", "Strategy Analyst"],
+  "Cybersecurity Analyst": ["SOC Analyst", "Security Engineer", "Vulnerability Analyst", "Incident Response Analyst"],
+  "Blockchain Developer": ["Smart Contract Developer", "Web3 Engineer", "Blockchain Intern", "DApp Developer"],
+  "Cloud Engineer": ["Cloud Support Engineer", "Cloud Operations Associate", "Site Reliability Engineer", "AWS Engineer"],
+  "DevOps Engineer": ["Release Engineer", "Build Engineer", "Infrastructure Engineer", "Automation Engineer"],
+  "Mobile App Developer": ["React Native Developer", "Flutter Developer", "Android Developer", "iOS Developer"],
+  "UI/UX Designer": ["UX Designer", "Product Designer", "Interaction Designer", "Visual Designer"],
+  "Product Manager": ["Product Analyst", "Associate Product Manager", "Product Owner", "Strategy Analyst"]
+};
+
+function makeGuidanceSimilarProfiles(career) {
+  return [
+    {
+      profile_id: "Anon profile 01",
+      career,
+      similarity_score: Math.round(88 + Math.random() * 8)
+    },
+    {
+      profile_id: "Anon profile 02",
+      career,
+      similarity_score: Math.round(82 + Math.random() * 10)
+    },
+    {
+      profile_id: "Anon profile 03",
+      career,
+      similarity_score: Math.round(78 + Math.random() * 12)
+    }
+  ];
+}
+
 const profileFeatureFields = [
   ["Math_Interest", "Math Interest", 1, 10],
   ["Physics_Interest", "Physics Interest", 1, 10],
@@ -614,12 +649,13 @@ function RecommendationPanel({ recommendation, onNavigate }) {
   );
 }
 
-function CareerProfileForm({ mode, onSaved, onNavigate }) {
+function CareerProfileForm({ mode, onSaved, onNavigate, onRecommend }) {
   const [features, setFeatures] = useState(defaultProfileFeatures);
   const [mcqAnswers, setMcqAnswers] = useState({});
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(45 * 60);
   const [recommendation, setRecommendation] = useState(null);
+  const [testResult, setTestResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const recommendationRef = useRef(null);
@@ -674,12 +710,16 @@ function CareerProfileForm({ mode, onSaved, onNavigate }) {
         body: JSON.stringify({ features: payloadFeatures })
       });
       setRecommendation(data.recommendation);
-      onSaved?.(data.result);
+      setTestResult({ ...data.result, sectionResults: isGuided ? subjectResults : [] });
+      if (!isGuided) {
+        onRecommend?.(data.recommendation, data.result);
+      }
     } catch (err) {
       const payloadFeatures = isGuided
         ? buildGuidedFeatures()
         : normalizeProfileFeatures(features);
       setRecommendation(makeLocalRecommendation(payloadFeatures));
+      setTestResult({ scores: payloadFeatures, recommendation: makeLocalRecommendation(payloadFeatures), sectionResults: isGuided ? subjectResults : [] });
       setError("ML service is not responding, so a local recommendation is shown for testing.");
     } finally {
       setLoading(false);
@@ -717,6 +757,12 @@ function CareerProfileForm({ mode, onSaved, onNavigate }) {
     }
   }
 
+  function openResultDialog() {
+    if (!recommendation) return;
+    const result = testResult || { scores: buildGuidedFeatures(), recommendation, sectionResults };
+    onRecommend?.(recommendation, result);
+  }
+
   return (
     <section className="advisor-card skill-builder">
       <p className="eyebrow">{isGuided ? "Career profiling test" : "Manual skills input"}</p>
@@ -740,7 +786,7 @@ function CareerProfileForm({ mode, onSaved, onNavigate }) {
               <div className="profile-complete-card">
                 <p className="eyebrow">Test completed</p>
                 <h3>Your profile recommendation is ready</h3>
-                <p>Scroll down to review the suggested career, fit score, and learning plan.</p>
+                <p>Click View Results to see career recommendations, similar profiles, and feedback from other users.</p>
                 <div className="profile-complete-metrics">
                   <div>
                     <span>Completion</span>
@@ -751,23 +797,18 @@ function CareerProfileForm({ mode, onSaved, onNavigate }) {
                     <strong>{Math.round((recommendation?.confidence || 0) * 100)}%</strong>
                   </div>
                 </div>
+                <button className="primary" onClick={openResultDialog} disabled={!recommendation || loading}>
+                  {loading ? "Preparing..." : "View Results"}
+                </button>
               </div>
             ) : (
-              <div className="profile-question-list">
-                {sectionProgress.map((section, index) => (
-                  <button
-                    key={section.title}
-                    className={`${currentSection.title === section.title ? "active" : ""} ${section.answered === section.questions.length ? "answered" : ""}`}
-                    onClick={() => setActiveQuestion(section.firstQuestionIndex)}
-                  >
-                    <span>{index + 1}</span>
-                    <div>
-                      <strong>{section.title.replace(/^Section \d+: /, "")}</strong>
-                      <small>{section.answered}/{section.questions.length} answered</small>
-                    </div>
-                    <i aria-hidden="true" />
-                  </button>
-                ))}
+              <div className="profile-test-instructions">
+                <strong>Career profiling test</strong>
+                <p>Answer every MCQ. The system converts correct answers into model features, predicts careers, then compares your profile with similar successful profiles using KNN.</p>
+                <div>
+                  <span>{answeredCount}</span>
+                  <small>answered out of {questions.length}</small>
+                </div>
               </div>
             )}
           </aside>
@@ -810,7 +851,7 @@ function CareerProfileForm({ mode, onSaved, onNavigate }) {
               <button disabled={activeQuestion === questions.length - 1} onClick={() => setActiveQuestion(activeQuestion + 1)}>Next</button>
               <button
                 className="primary"
-                onClick={recommendation ? () => recommendationRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }) : submitProfile}
+                onClick={recommendation ? openResultDialog : submitProfile}
                 disabled={loading || answeredCount < questions.length}
               >
                 {loading ? "Predicting..." : recommendation ? "View Results" : answeredAll ? "Generate Recommendation" : "Generate Prediction"}
@@ -879,12 +920,14 @@ function CareerProfileForm({ mode, onSaved, onNavigate }) {
   );
 }
 
-function SkillInputPanel({ onSaved, onNavigate }) {
+function SkillInputPanel({ onSaved, onNavigate, onRecommend }) {
   const [skills, setSkills] = useState("React, Python, SQL, Communication");
   const [saved, setSaved] = useState(false);
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const parsed = skills.split(",").map((skill) => skill.trim()).filter(Boolean);
+  const userFeatures = featuresFromSkillList(parsed);
 
   async function saveSkills() {
     setLoading(true);
@@ -898,7 +941,8 @@ function SkillInputPanel({ onSaved, onNavigate }) {
       body: JSON.stringify({ features })
     });
     setRecommendation(data.recommendation);
-    onSaved?.(data.result);
+    // prefer interactive selection: let parent handle finalizing via onRecommend
+    onRecommend?.(data.recommendation, data.result);
     setSaved(true);
     setLoading(false);
   }
@@ -918,7 +962,28 @@ function SkillInputPanel({ onSaved, onNavigate }) {
         {loading ? "Generating..." : saved ? "Skills Saved + Recommendation Updated" : "Save Skills & Update Recommendation"}
       </button>
       <button className="secondary" onClick={() => onNavigate?.("guidance")}>Go to Guidance Path</button>
+      
+      {saved && (
+        <button 
+          className="secondary" 
+          onClick={() => setShowFeedback(true)}
+          style={{ marginLeft: "8px", backgroundColor: "#FF9800" }}
+        >
+          <MessageSquare size={16} style={{ marginRight: "6px" }} />
+          Provide Feedback
+        </button>
+      )}
+
       <RecommendationPanel recommendation={recommendation} onNavigate={onNavigate} />
+
+      {showFeedback && (
+        <FeedbackFormModal 
+          career={recommendation?.career || "Software Engineer"}
+          recommendedCareers={[recommendation?.career, ...(recommendation?.alternatives || [])].filter(Boolean)}
+          userFeatures={userFeatures}
+          onClose={() => setShowFeedback(false)}
+        />
+      )}
     </section>
   );
 }
@@ -1240,15 +1305,85 @@ function RoadmapPanel() {
 
 function GuidancePanel() {
   const [data, setData] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [similarProfiles, setSimilarProfiles] = useState([]);
+  const [jobRoles, setJobRoles] = useState([]);
+  const [careerOptions, setCareerOptions] = useState([]);
+  const [showProfileFeedback, setShowProfileFeedback] = useState(false);
+  const [feedbackForCareer, setFeedbackForCareer] = useState(null);
+  const [feedbackCareerPrefill, setFeedbackCareerPrefill] = useState(null);
 
   useEffect(() => {
     api("/advisor/guidance").then(setData);
   }, []);
 
+  useEffect(() => {
+    if (!data?.career) return;
+    setJobRoles(careerRoleMap[data.career] || [
+      `${data.career} Intern`,
+      `${data.career} Associate`,
+      `${data.career} Specialist`,
+      `${data.career} Analyst`
+    ]);
+    setSimilarProfiles(makeGuidanceSimilarProfiles(data.career));
+    const careers = [data.career, ...(careerRoleMap[data.career] || [])];
+    setCareerOptions(Array.from(new Set(careers)).slice(0, 4));
+  }, [data]);
+
+  async function openProfileFeedback(career) {
+    try {
+      const res = await fetch('/api/advisor/feedback');
+      if (!res.ok) return;
+      const json = await res.json();
+      const entries = (json.feedback || []).filter(f => f.selectedCareer === career);
+      setFeedbackForCareer({ career, entries });
+      setShowProfileFeedback(true);
+    } catch (err) {
+      console.error('Error fetching feedback:', err);
+    }
+  }
+
   return (
     <section className="advisor-card roadmap-panel guidance-panel">
       <p className="eyebrow">Personalized guidance</p>
       <h2>{data?.career || "AI Career Suggestions"}</h2>
+
+      <div className="guidance-dashboard-grid">
+        <div className="guidance-summary-card">
+          <span>Recommended career</span>
+          <h3>{data?.career || "Career Path"}</h3>
+          <div className="recommendation-score">
+            <strong>{data?.confidence ? `${Math.round(data.confidence * 100)}% fit` : "Fit score pending"}</strong>
+          </div>
+          <p>{data?.suggestions?.[0] || "Complete the profile test to unlock your best career guidance."}</p>
+        </div>
+
+        <div className="guidance-summary-card">
+          <span>Top careers to explore</span>
+          <div className="career-card-list">
+            {careerOptions.map((career, index) => (
+              <div key={career} className="career-card-item">
+                <strong>{career}</strong>
+                <small>{index === 0 ? "Primary match" : "Similar path"}</small>
+                <span>{Math.round(((data?.confidence || 0.7) - index * 0.08) * 100)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="guidance-summary-card">
+          <span>Similar profiles</span>
+          <div className="similar-profiles-list">
+            {similarProfiles.map((profile) => (
+              <div key={profile.profile_id} className="similar-profile-item" onClick={() => openProfileFeedback(profile.career)} style={{ cursor: 'pointer' }}>
+                <strong>{profile.profile_id}</strong>
+                <small>{profile.career}</small>
+                <span>{profile.similarity_score}% similar</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <div className="guidance-summary">
         {(data?.suggestions || ["Complete the test to unlock AI-based suggestions."]).map((item, index) => (
@@ -1258,6 +1393,17 @@ function GuidancePanel() {
           </div>
         ))}
       </div>
+
+      {data?.career && (
+        <button 
+          className="secondary" 
+          onClick={() => setShowFeedback(true)}
+          style={{ marginTop: "16px", backgroundColor: "#FF9800", display: "flex", alignItems: "center", gap: "6px" }}
+        >
+          <MessageSquare size={16} />
+          Share Your Progress
+        </button>
+      )}
 
       {data?.learningPath?.length ? (
         <>
@@ -1305,17 +1451,56 @@ function GuidancePanel() {
                 </div>
               </a>
             ))}
-          </div>
-          <div className="certification-list">
-            <h4>Free certifications</h4>
-            {data.learningResources.flatMap((resource) => resource.certifications || []).map((cert) => (
-              <a key={cert.url} href={cert.url} target="_blank" rel="noreferrer" className="cert-link">
-                {cert.title}
-              </a>
-            ))}
-          </div>
+                </div>
+                <div className="certification-list">
+                  <h4>Free certifications</h4>
+                  <div className="cert-grid">
+                    {data.learningResources.flatMap((resource) => resource.certifications || []).map((cert) => (
+                      <a key={cert.url} href={cert.url} target="_blank" rel="noreferrer" className="cert-link">
+                        {cert.title}
+                      </a>
+                    ))}
+                  </div>
+                </div>
         </>
       ) : null}
+
+      {showFeedback && (
+        <FeedbackFormModal 
+          career={data?.career || "Software Engineer"}
+                recommendedCareers={jobRoles}
+                userFeatures={{}}
+          onClose={() => setShowFeedback(false)}
+        />
+      )}
+
+      {showProfileFeedback && feedbackForCareer && (
+        <div className="feedback-modal-overlay" onClick={() => setShowProfileFeedback(false)}>
+          <div className="feedback-modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3>Feedback for {feedbackForCareer.career}</h3>
+            {feedbackForCareer.entries.length ? (
+              feedbackForCareer.entries.map((fb) => (
+                <div key={fb._id} style={{ padding: 12, borderBottom: '1px solid #eee' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <strong>{fb.selectedCareer}</strong>
+                    <small>{new Date(fb.createdAt).toLocaleDateString()}</small>
+                  </div>
+                  <p style={{ margin: '6px 0' }}>Outcome: {fb.outcome}</p>
+                  {fb.roleTitle && <p style={{ margin: '6px 0' }}>Role: {fb.roleTitle}</p>}
+                  {fb.timeTakenMonths != null && <p style={{ margin: '6px 0' }}>Time: {fb.timeTakenMonths} months</p>}
+                  {fb.feedbackNotes && <p style={{ marginTop: 8, color: '#444' }}>{fb.feedbackNotes}</p>}
+                </div>
+              ))
+            ) : (
+              <p>No feedback entries for this career yet.</p>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12, gap: 8 }}>
+              <button className="secondary" onClick={() => setShowProfileFeedback(false)}>Close</button>
+              <button className="primary" onClick={() => { setFeedbackCareerPrefill(feedbackForCareer.career); setShowProfileFeedback(false); setShowFeedback(true); }}>Provide Feedback</button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -1378,204 +1563,269 @@ function ChatPanel() {
   );
 }
 
-function SkillDevelopmentPanel() {
-  const [data, setData] = useState(null);
+function RecommendationChooser({ recommendation, result, onConfirm, onClose }) {
+  const [selectedCareer, setSelectedCareer] = useState(recommendation?.career);
+  const [knnRecommendations, setKnnRecommendations] = useState([]);
+  const [similarProfiles, setSimilarProfiles] = useState([]);
+  const [analyticsMap, setAnalyticsMap] = useState({});
+  const [communityFeedbackMap, setCommunityFeedbackMap] = useState({});
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
   useEffect(() => {
-    api("/advisor/skills").then(setData);
-  }, []);
+    if (!result?.scores) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api("/advisor/knn-recommend", {
+          method: "POST",
+          body: JSON.stringify({ features: result.scores, k: 5, num_recommendations: 4 })
+        });
+        if (!cancelled) {
+          setKnnRecommendations(data.knn_recommendations || []);
+          setSimilarProfiles(data.similar_profiles || []);
+        }
+      } catch (err) {
+        console.warn("KNN fetch failed in chooser:", err.message || err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [result]);
+
+  const careers = [
+    ...knnRecommendations.map((item) => item.career),
+    recommendation?.career,
+    ...(recommendation?.alternatives || []).map((item) => item.career)
+  ].filter(Boolean).filter((career, index, list) => list.indexOf(career) === index).slice(0, 4);
+  const sectionResults = result?.sectionResults || [];
+
+  useEffect(() => {
+    careers.forEach(async (career) => {
+      try {
+        const json = await api(`/advisor/analytics/${encodeURIComponent(career)}`);
+        setAnalyticsMap((prev) => ({ ...prev, [career]: json.analytics }));
+      } catch {
+        // Optional analytics can be absent while the project is in development.
+      }
+    });
+
+    (async () => {
+      for (const career of careers) {
+        try {
+          const json = await api(`/advisor/feedback/career/${encodeURIComponent(career)}`);
+          setCommunityFeedbackMap((prev) => ({ ...prev, [career]: json }));
+        } catch {
+          // Optional feedback samples can be absent for new careers.
+        }
+      }
+    })();
+  }, [careers.join("|")]);
 
   return (
-    <section className="advisor-card skill-builder">
-      <p className="eyebrow">Skill development</p>
-      <h2>{data?.career || "Learning Path"}</h2>
-      <div className="chips">
-        {(data?.recommendedSkills || ["JavaScript", "SQL", "Communication"]).map((skill) => <span key={skill}>{skill}</span>)}
-      </div>
-      {(data?.learningPath || []).map((item) => (
-        <div className="road-step" key={item.skill}>
-          <span><BookOpen size={16} /></span>
-          <p>{item.action}</p>
+    <div className="feedback-modal-overlay" onClick={onClose}>
+      <div className="feedback-modal-card recommendation-dialog" onClick={(event) => event.stopPropagation()}>
+        <h3>View results and choose a career</h3>
+        <p>Review Random Forest prediction, KNN similar-profile matches, and community feedback before continuing.</p>
+
+        {sectionResults.length ? (
+          <div className="chooser-section">
+            <h4>Section-wise test results</h4>
+            <div className="section-chart-grid">
+              {sectionResults.map((section) => (
+                <article key={section.title} className="section-chart-card">
+                  <div className="mini-pie" style={{ "--score": `${Math.max(0, Math.min(100, section.score || 0))}%` }}>
+                    <span>{section.score}%</span>
+                  </div>
+                  <div>
+                    <strong>{section.title.replace(/^Section \d+: /, "")}</strong>
+                    <small>{section.description}</small>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="chooser-career-grid">
+          {careers.map((career) => (
+            <label key={career} className={`chooser-career-card ${selectedCareer === career ? "selected" : ""}`}>
+              <div>
+                <strong>{career}</strong>
+                <small>{analyticsMap[career]?.mostCommonOutcome ? `Most common: ${analyticsMap[career].mostCommonOutcome}` : "Career recommendation"}</small>
+                {communityFeedbackMap[career] && <small>Community samples: {communityFeedbackMap[career].summary.total}</small>}
+              </div>
+              <div className="chooser-card-score">
+                {analyticsMap[career] && <span>{analyticsMap[career].successRate}% success</span>}
+                <input type="radio" name="career_choice" checked={selectedCareer === career} onChange={() => setSelectedCareer(career)} />
+              </div>
+            </label>
+          ))}
         </div>
-      ))}
-    </section>
+
+        <div className="chooser-section">
+          <h4>KNN similar-career matches</h4>
+          <div className="chooser-mini-grid">
+            {knnRecommendations.length ? knnRecommendations.map((rec) => {
+              const rawScore = Number(rec.confidence ?? rec.score ?? 0);
+              const percent = Math.round(rawScore > 1 ? rawScore : rawScore * 100);
+              return (
+                <article key={rec.career}>
+                  <strong>{rec.career}</strong>
+                  <small>{percent}% confidence</small>
+                  <span>{rec.similar_profile_count || 0} similar profiles</span>
+                </article>
+              );
+            }) : <p>No KNN recommendations available yet.</p>}
+          </div>
+        </div>
+
+        <div className="chooser-section">
+          <h4>Similar anonymous profiles</h4>
+          <div className="chooser-scroll-list">
+            {similarProfiles.length ? similarProfiles.map((profile, index) => (
+              <div key={`${profile.profile_id || "profile"}-${index}`} className="similar-profile-row">
+                <strong>{profile.profile_id || `Profile ${index + 1}`}</strong>
+                <span>{profile.career} | Similarity {profile.similarity_score}%</span>
+                {profile.feedback && <small>{profile.feedback}</small>}
+              </div>
+            )) : <p>No similar profiles found.</p>}
+          </div>
+        </div>
+
+        <div className="chooser-section">
+          <h4>Community feedback samples</h4>
+          <div className="chooser-scroll-list">
+            {Object.entries(communityFeedbackMap).length ? Object.entries(communityFeedbackMap).map(([career, info]) => (
+              <div key={career} className="community-feedback-row">
+                <strong>{career}</strong>
+                <span>Samples: {info.summary.total} | Avg time: {info.summary.averageTimeMonths} months</span>
+                {info.samples?.slice(0, 3).map((sample, index) => (
+                  <div key={`${career}-${index}`} className="community-feedback-sample">
+                    <strong>{sample.outcome}</strong>
+                    {sample.roleTitle && <small>{sample.roleTitle}</small>}
+                    {sample.feedbackNotes && <p>{sample.feedbackNotes}</p>}
+                  </div>
+                ))}
+              </div>
+            )) : <p>No community feedback yet.</p>}
+          </div>
+        </div>
+
+        <div className="dialog-actions">
+          <button className="secondary" onClick={onClose}>Cancel</button>
+          <button className="secondary" onClick={() => setShowFeedbackForm(true)} disabled={!selectedCareer}>Provide Feedback</button>
+          <button className="primary" onClick={() => onConfirm(selectedCareer)} disabled={!selectedCareer}>Confirm and Continue</button>
+        </div>
+
+        {showFeedbackForm && (
+          <FeedbackFormModal career={selectedCareer} recommendedCareers={careers} userFeatures={result?.scores || {}} onClose={() => setShowFeedbackForm(false)} />
+        )}
+      </div>
+    </div>
   );
 }
-
-function MentorPanel() {
-  const [data, setData] = useState(null);
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState("");
+function FeedbackFormModal({ career, recommendedCareers = [], userFeatures = {}, onClose }) {
+  const [outcome, setOutcome] = useState("");
+  const [roleTitle, setRoleTitle] = useState("");
+  const [timeTaken, setTimeTaken] = useState("");
+  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
-  const [booked, setBooked] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    api("/advisor/mentor").then(setData);
-  }, []);
+  const handleSubmit = async (event) => {
+    event?.preventDefault();
+    setError("");
+    setMessage("");
+    if (!outcome) {
+      setError("Please select an outcome before submitting feedback.");
+      return;
+    }
 
-  async function askExpert(prompt = question) {
-    const text = prompt.trim();
-    if (!text || loading) return;
-    setQuestion(text);
-    setAnswer("");
     setLoading(true);
     try {
-      const response = await api("/advisor/chat", {
+      await api("/advisor/feedback", {
         method: "POST",
-        body: JSON.stringify({ text: `Act as an expert career mentor. ${text}` })
+        body: JSON.stringify({
+          userFeatures,
+          recommendedCareers,
+          selectedCareer: career,
+          outcome,
+          roleTitle,
+          timeTakenMonths: timeTaken ? Number(timeTaken) : null,
+          feedbackNotes: notes
+        })
       });
-      setAnswer(response.answer);
-    } catch (err) {
-      setAnswer(err.message || "Unable to get expert guidance right now.");
+      setMessage("Feedback saved successfully. Thank you for improving recommendations.");
+      window.setTimeout(onClose, 900);
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      setError(error.message || "Error submitting feedback. Please try again.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <section className="advisor-card mentor-panel">
-      <div className="section-title">
-        <div>
-          <p className="eyebrow">Expert guidance</p>
-          <h2>{data?.career || "Career"} Mentor Support</h2>
-          <p>Ask a focused question, book a mentor slot, and prepare with a clear session plan.</p>
-        </div>
-        <UserRound size={28} />
-      </div>
-      <div className="mentor-grid">
-        {(data?.mentors || []).map((mentor) => (
-          <article className="mentor-card" key={mentor.name}>
-            <div>
-              <strong>{mentor.name}</strong>
-              <small>{mentor.focus}</small>
-            </div>
-            <span>{mentor.match}% match</span>
-            <p>{mentor.availability}</p>
-          </article>
-        ))}
-      </div>
-      {(data?.mentorTips || ["Ask for resume review", "Prepare interview answers", "Discuss your roadmap"]).map((tip, index) => (
-        <div className="road-step" key={tip}>
-          <span>{index + 1}</span>
-          <p>{tip}</p>
-        </div>
-      ))}
-      <div className="mentor-actions-grid">
-        <div className="mentor-box">
-          <h3>Quick expert prompts</h3>
-          <div className="chips mentor-prompt-chips">
-            {(data?.chatPrompts || []).map((prompt) => (
-              <button key={prompt} type="button" onClick={() => askExpert(prompt)}>{prompt}</button>
-            ))}
-          </div>
-          <textarea
-            value={question}
-            onChange={(event) => setQuestion(event.target.value)}
-            placeholder="Example: How should I prepare for interviews in my target career?"
-          />
-          <button className="primary" onClick={() => askExpert()} disabled={loading || !question.trim()}>
-            {loading ? "Getting guidance..." : "Get Expert Answer"}
-          </button>
-          {answer && <div className="expert-answer"><strong>Expert answer</strong><p>{answer}</p></div>}
-        </div>
-        <div className="mentor-box">
-          <h3>Book guidance slot</h3>
-          <select value={selectedSlot} onChange={(event) => setSelectedSlot(event.target.value)}>
-            <option value="">Select a slot</option>
-            {(data?.bookingSlots || []).map((slot) => <option key={slot}>{slot}</option>)}
-          </select>
-          <button className="secondary" disabled={!selectedSlot} onClick={() => setBooked(true)}>Book Appointment</button>
-          {booked && <p className="success">Appointment request saved for {selectedSlot}. Prepare your questions before the call.</p>}
-          <h3>Session plan</h3>
-          {(data?.sessionPlan || []).map((tip, index) => (
-            <div className="road-step" key={tip}>
-              <span>{index + 1}</span>
-              <p>{tip}</p>
-            </div>
+    <div className="feedback-modal-overlay feedback-modal-overlay--nested" onClick={onClose}>
+      <form className="feedback-modal-card feedback-form-card" onClick={(event) => event.stopPropagation()} onSubmit={handleSubmit}>
+        <h3>Career Recommendation Feedback</h3>
+        <p style={{ color: "#666", marginTop: "8px" }}>Help us improve by sharing your experience with the {career} recommendation.</p>
+        {error && <p className="error">{error}</p>}
+        {message && <p className="success">{message}</p>}
+
+        <div className="feedback-field">
+          <label>What happened after this recommendation?</label>
+          {['Got Job', 'Got Internship', 'Still Learning', 'Not Interested'].map((opt) => (
+            <label key={opt} className="feedback-radio">
+              <input
+                type="radio"
+                name="outcome"
+                value={opt}
+                checked={outcome === opt}
+                onChange={(e) => setOutcome(e.target.value)}
+              />
+              {opt}
+            </label>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
 
-function ProgressPanel() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    api("/advisor/progress").then(setData);
-  }, []);
-
-  return (
-    <section className="advisor-card roadmap-panel">
-      <p className="eyebrow">Track progress</p>
-      <h2>{data?.roadmapProgress || 0}% Roadmap Complete</h2>
-      <div className="chips">
-        {(data?.completedSkills?.length ? data.completedSkills : ["Complete skills to track progress"]).map((skill) => <span key={skill}>{skill}</span>)}
-      </div>
-      {(data?.milestones || []).map((item) => (
-        <div className="road-step" key={item.title}>
-          <span>{item.done ? "✓" : "•"}</span>
-          <p>{item.title}</p>
+        <div className="feedback-field">
+          <label>Role title (optional)</label>
+          <input
+            type="text"
+            value={roleTitle}
+            onChange={(e) => setRoleTitle(e.target.value)}
+            placeholder="e.g., Data Science Intern"
+          />
         </div>
-      ))}
-    </section>
-  );
-}
 
-function ProfilePanel({ user }) {
-  const [report, setReport] = useState(null);
-
-  useEffect(() => {
-    api("/advisor/report").then(setReport);
-  }, []);
-
-  const career = report?.careerPrediction?.career || "Not predicted yet";
-  const confidence = Math.round((report?.careerPrediction?.confidence || 0) * 100);
-
-  return (
-    <section className="advisor-card profile-report-panel">
-      <div className="section-title">
-        <div>
-          <p className="eyebrow">Profile report</p>
-          <h2>{user.name}'s Career Report</h2>
-          <p>{user.email || "Student profile"} | Prediction, skills, roadmap, resume analysis, and export.</p>
+        <div className="feedback-field">
+          <label>Time taken to reach this outcome (months, optional)</label>
+          <input
+            type="number"
+            value={timeTaken}
+            onChange={(e) => setTimeTaken(e.target.value)}
+            placeholder="e.g., 4"
+          />
         </div>
-        <FileText size={28} />
-      </div>
-      <div className="report-hero">
-        <div><span>Predicted career</span><strong>{career}</strong></div>
-        <div><span>Confidence</span><strong>{confidence || 54}%</strong></div>
-        <div><span>Readiness</span><strong>{report?.readinessScore || 54}%</strong></div>
-      </div>
-      <div className="report-grid">
-        <article>
-          <h3>Recommended careers</h3>
-          {(report?.recommendedCareers || ["Complete the profiling test"]).map((item) => <p key={item}>{item}</p>)}
-        </article>
-        <article>
-          <h3>Skills to show</h3>
-          {(report?.skillAnalysis || ["Add skills or upload resume"]).map((item) => <p key={item}>{item}</p>)}
-        </article>
-        <article>
-          <h3>Learning roadmap</h3>
-          {(report?.learningRoadmap || ["Generate recommendation first"]).map((item, index) => <p key={item}>{index + 1}. {item}</p>)}
-        </article>
-        <article>
-          <h3>Resume analysis</h3>
-          {report?.resumeAnalysis ? (
-            <>
-              <p>ATS score: {report.resumeAnalysis.atsScore || "--"}%</p>
-              <p>Missing: {(report.resumeAnalysis.missingSkills || []).join(", ") || "No major gaps"}</p>
-            </>
-          ) : (
-            <p>Upload a resume to include NLP skill gap analysis.</p>
-          )}
-        </article>
-      </div>
-      <a className="primary report-download" href={`${API_ORIGIN}/api/advisor/report.csv`} target="_blank" rel="noreferrer">Download CSV Report</a>
-    </section>
+
+        <div className="feedback-field">
+          <label>Additional notes (optional)</label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Share your experience..."
+          />
+        </div>
+
+        <div className="feedback-actions">
+          <button type="button" className="secondary" onClick={onClose}>Cancel</button>
+          <button type="submit" className="primary" disabled={loading || !outcome}>
+            {loading ? "Submitting..." : "Submit Feedback"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 
@@ -1687,8 +1937,22 @@ function MainOptions({ activeFeature, onSelect }) {
 function Dashboard({ user, onLogout }) {
   const [activeFeature, setActiveFeature] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const latest = null;
-  const hideInsightRail = ["career-profile", "manual-profile", "resume", "college"].includes(activeFeature);
+  const [latest, setLatest] = useState(null);
+  const [pendingRecommendation, setPendingRecommendation] = useState(null);
+  const [pendingResultObj, setPendingResultObj] = useState(null);
+  function handleConfirmRecommendation(selectedCareer) {
+    if (!pendingResultObj || !pendingRecommendation) {
+      setPendingRecommendation(null);
+      setPendingResultObj(null);
+      return;
+    }
+    const final = { ...pendingResultObj, recommendation: { ...pendingRecommendation, career: selectedCareer } };
+    setLatest(final);
+    // clear pending
+    setPendingRecommendation(null);
+    setPendingResultObj(null);
+  }
+  const hideInsightRail = ["career-profile", "manual-profile", "resume", "college", "guidance"].includes(activeFeature);
 
   return (
     <main className={`portal-shell ${sidebarOpen ? "" : "sidebar-closed"}`}>
@@ -1770,10 +2034,10 @@ function Dashboard({ user, onLogout }) {
                 <ArrowRight size={18} /> Back to options
               </button>
             )}
-            {activeFeature === "career-profile" && <CareerProfileForm mode="guided" onNavigate={setActiveFeature} />}
-            {activeFeature === "manual-profile" && <CareerProfileForm mode="manual" onNavigate={setActiveFeature} />}
+            {activeFeature === "career-profile" && <CareerProfileForm mode="guided" onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
+            {activeFeature === "manual-profile" && <CareerProfileForm mode="manual" onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
             {activeFeature === "chat" && <ChatPanel />}
-            {activeFeature === "skills" && <SkillInputPanel onNavigate={setActiveFeature} />}
+            {activeFeature === "skills" && <SkillInputPanel onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
             {activeFeature === "college" && <CollegeRecommendationPanel />}
             {activeFeature === "resume" && <ResumePanel onNavigate={setActiveFeature} />}
             {activeFeature === "jobs" && <JobFinderPanel />}
@@ -1803,6 +2067,9 @@ function Dashboard({ user, onLogout }) {
           )}
         </section>
       </section>
+      {pendingRecommendation && (
+        <RecommendationChooser recommendation={pendingRecommendation} result={pendingResultObj} onConfirm={handleConfirmRecommendation} onClose={() => { setPendingRecommendation(null); setPendingResultObj(null); }} />
+      )}
       <button className="chatbot-launcher" onClick={() => setActiveFeature("chat")}> 
         <span className="chatbot-icon">💬</span>
         <div>
@@ -1814,5 +2081,6 @@ function Dashboard({ user, onLogout }) {
   );
 }
 export default Dashboard;
+
 
 

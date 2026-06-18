@@ -1704,7 +1704,7 @@ textarea {
 
 .profile-test-shell {
   display: grid;
-  grid-template-columns: minmax(340px, 420px) minmax(0, 1.7fr);
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1.7fr);
   gap: 20px;
   margin-top: 20px;
   width: 100%;
@@ -1757,6 +1757,47 @@ textarea {
   min-height: 260px;
   background: #f9fafc;
   border-top: 4px solid #7d5bd6;
+}
+
+.profile-complete-card .primary {
+  width: 100%;
+  justify-content: center;
+}
+
+.profile-test-instructions {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.profile-test-instructions strong {
+  font-size: 20px;
+}
+
+.profile-test-instructions p {
+  margin: 0;
+  color: #647087;
+  line-height: 1.55;
+}
+
+.profile-test-instructions div {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e1e7f2;
+}
+
+.profile-test-instructions div span {
+  font-size: 34px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.profile-test-instructions div small {
+  color: #647087;
+  font-weight: 800;
 }
 
 .profile-complete-card h3 {
@@ -2143,6 +2184,375 @@ textarea {
 .roadmap-panel {
   display: grid;
   gap: 12px;
+}
+
+.guidance-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.guidance-summary-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e6ebf4;
+  box-shadow: 0 14px 28px rgba(43, 54, 94, 0.07);
+}
+
+.guidance-summary-card span {
+  display: block;
+  color: #647087;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.guidance-summary-card h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.recommendation-score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.recommendation-score strong {
+  font-size: 1.3rem;
+  color: #111827;
+}
+
+.career-card-list,
+.similar-profiles-list,
+.cert-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.career-card-item,
+.similar-profile-item,
+.cert-link {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e1e7f2;
+}
+
+.career-card-item {
+  display: grid;
+  gap: 6px;
+}
+
+.career-card-item strong,
+.similar-profile-item strong {
+  font-size: 1rem;
+}
+
+.career-card-item small,
+.similar-profile-item small,
+.cert-link {
+  color: #647087;
+}
+
+.similar-profile-item {
+  display: grid;
+  gap: 6px;
+}
+
+.similar-profile-item span {
+  justify-self: flex-end;
+  color: #2563eb;
+  font-weight: 900;
+}
+
+.cert-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #111827;
+  text-decoration: none;
+}
+
+.guidance-feedback-button {
+  max-width: fit-content;
+  padding: 12px 18px;
+}
+
+.feedback-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 23, 42, 0.45);
+  padding: 12px;
+  z-index: 60;
+}
+
+.feedback-modal-overlay--nested {
+  background: rgba(15, 23, 42, 0.58);
+  z-index: 80;
+}
+
+.feedback-modal-card {
+  width: min(620px, 100%);
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  padding: 18px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 24px 72px rgba(15, 23, 42, 0.18);
+  display: grid;
+  gap: 12px;
+}
+
+.feedback-form-card {
+  width: min(520px, 100%);
+}
+
+.feedback-field {
+  display: grid;
+  gap: 10px;
+}
+
+.feedback-radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e1e7f2;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.feedback-radio input {
+  accent-color: #4f46e5;
+}
+
+.feedback-field input,
+.feedback-field textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d8e0ee;
+  background: #ffffff;
+  font: inherit;
+}
+
+.feedback-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.feedback-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.recommendation-dialog {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  border-radius: 12px;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+}
+
+.recommendation-dialog h3,
+.recommendation-dialog h4,
+.recommendation-dialog p {
+  margin: 0;
+}
+
+.recommendation-dialog .chooser-section {
+  min-height: 0;
+}
+
+.chooser-career-grid,
+.chooser-mini-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.chooser-career-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.chooser-career-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e1e7f2;
+  cursor: pointer;
+}
+
+.chooser-career-card.selected {
+  border-color: #4f46e5;
+  background: #eef2ff;
+}
+
+.chooser-career-card > div:first-child,
+.chooser-card-score {
+  display: grid;
+  gap: 5px;
+}
+
+.chooser-career-card small,
+.chooser-card-score span,
+.similar-profile-row span,
+.similar-profile-row small,
+.community-feedback-row span,
+.community-feedback-sample small {
+  color: #647087;
+}
+
+.chooser-card-score {
+  justify-items: end;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.chooser-card-score input {
+  width: 18px;
+  height: 18px;
+  accent-color: #4f46e5;
+}
+
+.chooser-section {
+  display: grid;
+  gap: 8px;
+}
+
+.section-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.section-chart-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #e1e7f2;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.section-chart-card strong,
+.section-chart-card small {
+  display: block;
+}
+
+.section-chart-card small {
+  color: #647087;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.mini-pie {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(#4f46e5 var(--score), #e6ebf4 0);
+  position: relative;
+}
+
+.mini-pie::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.mini-pie span {
+  position: relative;
+  z-index: 1;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.chooser-mini-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.chooser-mini-grid article,
+.similar-profile-row,
+.community-feedback-row,
+.community-feedback-sample {
+  display: grid;
+  gap: 4px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e1e7f2;
+}
+
+.chooser-mini-grid article span {
+  width: fit-content;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #eaf5f0;
+  color: #047857;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.chooser-scroll-list {
+  display: grid;
+  gap: 6px;
+  max-height: 130px;
+  overflow: auto;
+}
+
+.dialog-actions {
+  position: sticky;
+  bottom: -18px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 -18px -18px;
+  padding: 12px 18px;
+  border-top: 1px solid #e1e7f2;
+  background: #ffffff;
+}
+
+.dialog-actions button,
+.feedback-actions button,
+.profile-test-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 132px;
+}
+
+@media (max-width: 920px) {
+  .guidance-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chooser-career-grid,
+  .chooser-mini-grid,
+  .section-chart-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .road-step span {

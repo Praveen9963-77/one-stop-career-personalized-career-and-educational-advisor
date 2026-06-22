@@ -1,8 +1,11 @@
 import json
 import pickle
+import re
 from pathlib import Path
 from flask import Flask, jsonify, request
 import pandas as pd
+import spacy
+from spacy.cli import download as spacy_download
 from knn_module import KNNRecommender, recommend_with_knn
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -11,6 +14,26 @@ PICKLE_MODEL_PATHS = [
     BASE_DIR / "career_model.pkl",
     BASE_DIR.parent / "career_model.pkl",
 ]
+
+SPACY_MODEL = "en_core_web_sm"
+nlp = None
+
+
+def load_spacy_model():
+    global nlp
+    if nlp is not None:
+        return nlp
+    try:
+        nlp = spacy.load(SPACY_MODEL)
+        return nlp
+    except Exception:
+        try:
+            spacy_download(SPACY_MODEL)
+            nlp = spacy.load(SPACY_MODEL)
+            return nlp
+        except Exception as error:
+            raise RuntimeError(f"Failed to load spaCy model {SPACY_MODEL}: {error}")
+
 
 app = Flask(__name__)
 
@@ -50,6 +73,9 @@ SKILL_TAXONOMY = {
     "Creative Media Designer": {"photoshop", "illustrator", "animation", "video", "visual", "branding", "typography", "design"},
     "Research Associate": {"research", "statistics", "paper", "experiment", "methodology", "python", "writing", "analysis"},
 }
+
+ALL_KNOWN_SKILLS = sorted({skill for skills in SKILL_TAXONOMY.values() for skill in skills})
+
 
 STOP_WORDS = {
     "and", "the", "for", "with", "from", "that", "this", "have", "has", "are", "was", "were", "you", "your",
@@ -283,28 +309,70 @@ def extract_keywords(text):
     return [word for word, _count in sorted(counts.items(), key=lambda item: (-item[1], item[0]))[:12]]
 
 
+def extract_entities(text):
+    model = load_spacy_model()
+    doc = model(text)
+    entities = {
+        "SKILL": [],
+        "ORG": [],
+        "PERSON": [],
+        "GPE": [],
+        "DATE": [],
+        "EDU": []
+    }
+    for ent in doc.ents:
+        if ent.label_ in entities:
+            entities[ent.label_].append(ent.text)
+    return {key: sorted(set(values)) for key, values in entities.items()}
+
+
+def extract_skills_from_text(text):
+    text_lower = normalize_text(text)
+    found_skills = set()
+    for skill in ALL_KNOWN_SKILLS:
+        pattern = re.compile(rf"\b{re.escape(skill)}\b", re.IGNORECASE)
+        if pattern.search(text_lower):
+            found_skills.add(skill)
+    entity_skills = extract_entities(text).get("SKILL", [])
+    for entity in entity_skills:
+        if len(entity) > 2:
+            found_skills.add(entity)
+    return sorted(found_skills)
+
+
 def analyze_resume_text(resume_text):
-    text = normalize_text(resume_text)
-    extracted = sorted({skill for skills in SKILL_TAXONOMY.values() for skill in skills if skill in text})
+    extracted_skills = extract_skills_from_text(resume_text)
+    entities = extract_entities(resume_text)
     keywords = extract_keywords(resume_text)
 
     ranked = []
+    lower_skills = [skill.lower() for skill in extracted_skills]
     for career, required_skills in SKILL_TAXONOMY.items():
-        matched = required_skills.intersection(extracted)
-        score = len(matched) / len(required_skills)
+        matched = {skill for skill in required_skills if skill.lower() in lower_skills}
+        score = len(matched) / max(1, len(required_skills))
         ranked.append((career, score, sorted(required_skills - matched)))
 
     ranked.sort(key=lambda item: item[1], reverse=True)
     matched_career, score, missing = ranked[0]
-    readable_skills = [skill.title() if len(skill) <= 3 else skill for skill in extracted]
+
+    summary_parts = []
+    if entities["ORG"]:
+        summary_parts.append(f"Worked at {entities['ORG'][0]}")
+    if entities["DATE"]:
+        summary_parts.append(f"Timeframe includes {entities['DATE'][0]}")
+    if entities["GPE"]:
+        summary_parts.append(f"Location mentions {entities['GPE'][0]}")
+    if not summary_parts:
+        summary_parts.append("Resume text analyzed for role fit and skills.")
 
     return {
         "matchedCareer": matched_career,
-        "matchScore": round(max(0.35, min(0.96, score + 0.35)), 2),
-        "extractedSkills": readable_skills[:16],
+        "matchScore": round(max(0.35, min(0.98, score + 0.35)), 2),
+        "extractedSkills": extracted_skills[:24],
         "keywords": keywords,
-        "missingSkills": [skill.title() if len(skill) <= 3 else skill for skill in missing[:6]],
-        "summary": f"Resume language currently aligns most closely with {matched_career}. Add evidence for the missing skills to improve fit.",
+        "missingSkills": [skill.title() if len(skill) <= 3 else skill for skill in missing[:8]],
+        "summary": " ".join(summary_parts),
+        "entities": entities,
         "alternatives": [{"career": career, "score": round(value, 2)} for career, value, _missing in ranked[1:4]],
     }
 

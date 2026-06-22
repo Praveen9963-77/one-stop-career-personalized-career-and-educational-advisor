@@ -23,10 +23,27 @@ FEATURE_COLUMNS = [
 ]
 
 ROLE_PROTOTYPES = {
-    "Software Engineer": {"Coding_Skill": 9, "Problem_Solving": 9, "Database_Management": 7, "Web_Development": 7},
+    "Software Engineer": {
+        "Coding_Skill": 9,
+        "Problem_Solving": 9,
+        "Database_Management": 7,
+        "Web_Development": 7,
+        "AI_Interest": 5,
+        "Research_Interest": 4,
+        "Data_Analysis": 6,
+        "Cloud_Computing": 5,
+    },
     "Full Stack Developer": {"Web_Development": 10, "Coding_Skill": 9, "Database_Management": 8, "Cloud_Computing": 6},
     "Data Scientist": {"Data_Analysis": 10, "AI_Interest": 8, "Math_Interest": 8, "Analytical_Thinking": 9, "Research_Interest": 7},
-    "AI Engineer": {"AI_Interest": 10, "Coding_Skill": 8, "Math_Interest": 8, "Research_Interest": 8, "Data_Analysis": 8},
+    "AI Engineer": {
+        "AI_Interest": 10,
+        "Data_Analysis": 9,
+        "Research_Interest": 9,
+        "Math_Interest": 8,
+        "Coding_Skill": 8,
+        "Web_Development": 4,
+        "Cloud_Computing": 5,
+    },
     "Cybersecurity Analyst": {"Cybersecurity_Interest": 10, "Attention_To_Detail": 9, "Problem_Solving": 8, "Stress_Handling": 8},
     "Blockchain Developer": {"Blockchain_Interest": 10, "Coding_Skill": 8, "Problem_Solving": 8, "Database_Management": 6},
     "Cloud Engineer": {"Cloud_Computing": 10, "DevOps_Interest": 8, "Coding_Skill": 6, "Problem_Solving": 7},

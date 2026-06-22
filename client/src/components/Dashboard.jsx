@@ -17,6 +17,7 @@ import {
   Medal,
   MessageSquare,
   Menu,
+  Play,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -26,6 +27,7 @@ import {
 } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { API_ORIGIN, api } from "../api";
+import { skillQuizDataset } from "../data/skillQuizDataset";
 import ResumePanel from "./ResumePanel";
 import ResultPanel from "./ResultPanel";
 const sidebarFeatures = [
@@ -582,6 +584,13 @@ const mainOptions = [
     detail: "Use a simple questionnaire and get three to four suitable career paths."
   },
   {
+    id: "skill-quiz",
+    color: "green",
+    badge: "Dynamic quiz",
+    title: "Test Your Skills",
+    detail: "Load dataset questions or generate a fresh topic-wise quiz dynamically."
+  },
+  {
     id: "college",
     color: "orange",
     badge: "College match",
@@ -590,7 +599,7 @@ const mainOptions = [
   },
   {
     id: "resume",
-    color: "green",
+    color: "blue",
     badge: "NLP analysis",
     title: "Have a Resume?",
     detail: "Paste your resume and get skill extraction, missing skills, and career fit analysis."
@@ -609,22 +618,26 @@ const advisorFeatures = [
 function RecommendationPanel({ recommendation, onNavigate }) {
   if (!recommendation) return null;
 
-  const careers = [
-    { career: recommendation.career, score: recommendation.confidence },
-    ...(recommendation.alternatives || [])
-  ].slice(0, 4);
+  // Support stacked recommendations: if `recommendation.recommendations` exists, use it.
+  const stacked = Array.isArray(recommendation.recommendations) ? recommendation.recommendations : null;
+  const careers = stacked
+    ? stacked.map((r) => ({ career: r.career, score: (r.confidencePct || r.score || 0) / 100 }))
+    : [
+        { career: recommendation.career, score: recommendation.confidence },
+        ...(recommendation.alternatives || [])
+      ].slice(0, 4);
 
   return (
-    <div className="roadmap-panel career-recommendation-panel">
+      <div className="roadmap-panel career-recommendation-panel">
       <div className="recommendation-head">
         <div>
           <p className="eyebrow">Recommended career</p>
-          <h2>{recommendation.career}</h2>
-          <p>{recommendation.explanation}</p>
+          <h2>{stacked ? "Top career recommendations" : recommendation.career}</h2>
+          <p>{stacked ? "Aggregated from resume, test, and input signals." : recommendation.explanation}</p>
         </div>
         <div className="recommendation-score">
           <span>Fit score</span>
-          <strong>{Math.round((recommendation.confidence || 0) * 100)}%</strong>
+          <strong>{Math.round(((stacked && stacked[0]) ? (stacked[0].confidencePct || Math.round((stacked[0].score || 0) * 100)) : (recommendation.confidence || 0) * 100) || 0)}%</strong>
         </div>
       </div>
       <div className="recommendation-list">
@@ -649,10 +662,22 @@ function RecommendationPanel({ recommendation, onNavigate }) {
   );
 }
 
-function CareerProfileForm({ mode, onSaved, onNavigate, onRecommend }) {
+function CareerProfileForm({ mode, profile, onSaved, onNavigate, onRecommend }) {
   const [features, setFeatures] = useState(defaultProfileFeatures);
   const [mcqAnswers, setMcqAnswers] = useState({});
   const [activeQuestion, setActiveQuestion] = useState(0);
+
+  useEffect(() => {
+    if (profile?.skills?.length) {
+      const derivedFeatures = featuresFromSkillList(profile.skills);
+      setFeatures((current) => {
+        const isDefault = Object.keys(defaultProfileFeatures).every(
+          (key) => current[key] === defaultProfileFeatures[key]
+        );
+        return isDefault ? derivedFeatures : current;
+      });
+    }
+  }, [profile?.skills]);
   const [secondsLeft, setSecondsLeft] = useState(45 * 60);
   const [recommendation, setRecommendation] = useState(null);
   const [testResult, setTestResult] = useState(null);
@@ -714,12 +739,25 @@ function CareerProfileForm({ mode, onSaved, onNavigate, onRecommend }) {
       if (!isGuided) {
         onRecommend?.(data.recommendation, data.result);
       }
+
+      onSaved?.({ recommendation: data.recommendation, scores: data.result?.scores || payloadFeatures, profile: { ...profile, targetRole: data.recommendation.career } });
+
+      try {
+        await api("/advisor/profile", {
+          method: "PUT",
+          body: JSON.stringify({ targetRole: data.recommendation.career })
+        });
+      } catch (profileError) {
+        console.warn("Unable to persist career profile target:", profileError.message || profileError);
+      }
     } catch (err) {
       const payloadFeatures = isGuided
         ? buildGuidedFeatures()
         : normalizeProfileFeatures(features);
-      setRecommendation(makeLocalRecommendation(payloadFeatures));
-      setTestResult({ scores: payloadFeatures, recommendation: makeLocalRecommendation(payloadFeatures), sectionResults: isGuided ? subjectResults : [] });
+      const fallbackRecommendation = makeLocalRecommendation(payloadFeatures);
+      setRecommendation(fallbackRecommendation);
+      setTestResult({ scores: payloadFeatures, recommendation: fallbackRecommendation, sectionResults: isGuided ? subjectResults : [] });
+      onSaved?.({ recommendation: fallbackRecommendation, scores: payloadFeatures, profile: { ...profile, targetRole: fallbackRecommendation.career } });
       setError("ML service is not responding, so a local recommendation is shown for testing.");
     } finally {
       setLoading(false);
@@ -920,13 +958,20 @@ function CareerProfileForm({ mode, onSaved, onNavigate, onRecommend }) {
   );
 }
 
-function SkillInputPanel({ onSaved, onNavigate, onRecommend }) {
-  const [skills, setSkills] = useState("React, Python, SQL, Communication");
+function SkillInputPanel({ profile, onSaved, onNavigate, onRecommend }) {
+  const defaultSkills = "React, Python, SQL, Communication";
+  const [skills, setSkills] = useState(defaultSkills);
   const [saved, setSaved] = useState(false);
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const parsed = skills.split(",").map((skill) => skill.trim()).filter(Boolean);
+
+  useEffect(() => {
+    if (profile?.skills?.length && (skills === defaultSkills || !skills.trim())) {
+      setSkills(profile.skills.join(", "));
+    }
+  }, [profile?.skills]);
   const userFeatures = featuresFromSkillList(parsed);
 
   async function saveSkills() {
@@ -1009,6 +1054,182 @@ function CodingPracticePanel() {
   );
 }
 
+function shuffleItems(items) {
+  return [...items].sort(() => Math.random() - 0.5);
+}
+
+function SkillQuizPanel() {
+  const categories = ["All", ...Array.from(new Set(skillQuizDataset.map((item) => item.category)))];
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [quizPool, setQuizPool] = useState([]);
+  const [activeQuiz, setActiveQuiz] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [completed, setCompleted] = useState(false);
+
+  const groupedQuizzes = useMemo(() => {
+    return categories
+      .filter((category) => category !== "All")
+      .map((category) => {
+        const questions = skillQuizDataset.filter((item) => item.category === category);
+        return {
+          category,
+          title: questions[0]?.title || category,
+          count: questions.length,
+          difficulty: questions.some((item) => item.difficulty === "Medium") ? "Medium" : "Easy"
+        };
+      });
+  }, []);
+
+  const visiblePool = selectedCategory === "All"
+    ? skillQuizDataset
+    : skillQuizDataset.filter((item) => item.category === selectedCategory);
+
+  function loadAllQuizzes() {
+    setQuizPool(skillQuizDataset);
+    setActiveQuiz(null);
+    setCompleted(false);
+    setAnswers({});
+  }
+
+  function generateQuiz(category = selectedCategory) {
+    const pool = category === "All"
+      ? skillQuizDataset
+      : skillQuizDataset.filter((item) => item.category === category);
+    const nextQuiz = shuffleItems(pool).slice(0, Math.min(5, pool.length || 5));
+    setSelectedCategory(category);
+    setQuizPool(pool);
+    setActiveQuiz(nextQuiz);
+    setCurrentIndex(0);
+    setAnswers({});
+    setCompleted(false);
+  }
+
+  function startTopic(category) {
+    generateQuiz(category);
+  }
+
+  function chooseAnswer(questionId, option) {
+    setAnswers((prev) => ({ ...prev, [questionId]: option }));
+  }
+
+  function finishQuiz() {
+    setCompleted(true);
+  }
+
+  const currentQuestion = activeQuiz?.[currentIndex];
+  const score = activeQuiz?.reduce((total, item) => total + (answers[item.id] === item.answer ? 1 : 0), 0) || 0;
+  const percentage = activeQuiz?.length ? Math.round((score / activeQuiz.length) * 100) : 0;
+  const categoryStats = activeQuiz?.reduce((acc, item) => {
+    if (!acc[item.category]) acc[item.category] = { total: 0, correct: 0 };
+    acc[item.category].total += 1;
+    if (answers[item.id] === item.answer) acc[item.category].correct += 1;
+    return acc;
+  }, {}) || {};
+
+  return (
+    <section className="advisor-card skill-quiz-panel">
+      <div className="quiz-hero">
+        <div>
+          <p className="eyebrow">Quiz section</p>
+          <h2>Test your skills</h2>
+          <p>Questions are selected dynamically from an external-style dataset file by category, difficulty, and topic.</p>
+        </div>
+        <BookOpen size={28} />
+      </div>
+
+      <div className="quiz-action-card">
+        <select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)}>
+          {categories.map((category) => <option key={category} value={category}>{category}</option>)}
+        </select>
+        <button className="primary" onClick={loadAllQuizzes}>
+          <ListChecks size={18} /> Load All Quizzes
+        </button>
+        <button className="primary quiz-generate-btn" onClick={() => generateQuiz()}>
+          <Sparkles size={18} /> Generate Dynamic Quiz
+        </button>
+      </div>
+
+      {!activeQuiz && (
+        <div className="quiz-topic-grid">
+          {groupedQuizzes.map((quiz) => (
+            <article className="quiz-topic-card" key={quiz.category}>
+              <span>{quiz.category}</span>
+              <h3>{quiz.title}</h3>
+              <p>Category: {quiz.category}</p>
+              <strong>Questions: {quiz.count}</strong>
+              <button className="primary" onClick={() => startTopic(quiz.category)}>
+                <Play size={17} /> Start Quiz
+              </button>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {activeQuiz && !completed && currentQuestion && (
+        <div className="quiz-runner">
+          <div className="quiz-runner-top">
+            <div>
+              <span>Question {currentIndex + 1} of {activeQuiz.length}</span>
+              <h3>{currentQuestion.title}</h3>
+              <p>{currentQuestion.category} | {currentQuestion.difficulty} | {currentQuestion.source}</p>
+            </div>
+            <strong>{Object.keys(answers).length}/{activeQuiz.length} answered</strong>
+          </div>
+          <h4>{currentQuestion.question}</h4>
+          <div className="quiz-option-list">
+            {currentQuestion.options.map((option) => (
+              <button
+                key={option}
+                className={answers[currentQuestion.id] === option ? "selected" : ""}
+                onClick={() => chooseAnswer(currentQuestion.id, option)}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+          <div className="profile-test-actions">
+            <button className="secondary" disabled={currentIndex === 0} onClick={() => setCurrentIndex((value) => value - 1)}>Previous</button>
+            {currentIndex < activeQuiz.length - 1 ? (
+              <button className="primary" onClick={() => setCurrentIndex((value) => value + 1)}>Next</button>
+            ) : (
+              <button className="primary" onClick={finishQuiz}>Submit Quiz</button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {activeQuiz && completed && (
+        <div className="quiz-result-card">
+          <div className="quiz-score-circle">
+            <strong>{percentage}%</strong>
+            <span>{score}/{activeQuiz.length}</span>
+          </div>
+          <div>
+            <h3>Quiz performance</h3>
+            <p>{percentage >= 70 ? "Strong performance. You can move to higher difficulty questions." : "Good start. Review explanations and retry the weak topics."}</p>
+            <div className="quiz-analysis-grid">
+              {Object.entries(categoryStats).map(([category, stat]) => (
+                <div key={category}>
+                  <strong>{category}</strong>
+                  <span>{Math.round((stat.correct / stat.total) * 100)}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <button className="primary" onClick={() => generateQuiz(selectedCategory)}>
+            <Sparkles size={18} /> Generate New Quiz
+          </button>
+        </div>
+      )}
+
+      {quizPool.length > 0 && !activeQuiz && (
+        <p className="quiz-source-note">Loaded {visiblePool.length} questions from the dataset. Select a topic or generate a random quiz.</p>
+      )}
+    </section>
+  );
+}
+
 function JobFinderPanel() {
   const [data, setData] = useState({ jobs: jobMatches });
   const [query, setQuery] = useState("");
@@ -1054,6 +1275,7 @@ function JobFinderPanel() {
         <div>
           <p className="eyebrow">Job finder</p>
           <h2>Recommended opportunities</h2>
+          {data.career && <small style={{ color: "#64748b", marginTop: "6px" }}>Tailored for {data.career}</small>}
         </div>
         <Search size={22} />
       </div>
@@ -1091,24 +1313,51 @@ function JobFinderPanel() {
         <small>{loading ? 'Searching jobs…' : `${data.jobs.length} jobs found`}</small>
       </div>
 
+      {data.profileSkills?.length ? (
+        <div className="job-profile-context">
+          Profile matched with: {data.profileSkills.slice(0, 6).join(", ")}
+        </div>
+      ) : null}
+
       {data.jobs.length === 0 ? (
         <div className="empty-state">
           <p>No jobs matched your search yet. Try broadening the keywords or update your location.</p>
         </div>
       ) : (
-        data.jobs.map((job) => (
-          <div className="job-row" key={`${job.role}-${job.company || job.location}`}>
-            <div>
-              <strong>{job.role}</strong>
-              <small>{job.company || job.type} • {job.location}</small>
-              <p>{job.skills}</p>
+        <div className="job-card-grid">
+          {data.jobs.map((job) => (
+            <div className="job-card" key={`${job.role}-${job.company || job.location}`}>
+              <div className="job-card-header">
+                <div>
+                  <small className="job-card-tag">{job.type}</small>
+                  <strong>{job.role}</strong>
+                </div>
+                <span className="job-card-fit">{job.fit}</span>
+              </div>
+
+              <div className="job-card-info">
+                <span className="job-card-company">{job.company}</span>
+                <span className="job-card-location">{job.location}</span>
+              </div>
+
+              <div className="job-card-meta">
+                <small>{job.skills}</small>
+                <strong>{job.salary}</strong>
+              </div>
+              <div className="job-match-details">
+                {job.matchedSkills?.length ? <small>Matched: {job.matchedSkills.join(", ")}</small> : <small>Matched with your saved career profile</small>}
+                {job.missingSkills?.length ? <small>Improve: {job.missingSkills.join(", ")}</small> : null}
+              </div>
+              <div className="job-link-row">
+                {(job.links || []).map((link) => (
+                  <a key={link.label} href={link.url} target="_blank" rel="noreferrer">
+                    {link.label}
+                  </a>
+                ))}
+              </div>
             </div>
-            <div className="job-meta">
-              <span>{job.fit}</span>
-              <small>{job.salary}</small>
-            </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </section>
   );
@@ -1312,6 +1561,7 @@ function GuidancePanel() {
   const [showProfileFeedback, setShowProfileFeedback] = useState(false);
   const [feedbackForCareer, setFeedbackForCareer] = useState(null);
   const [feedbackCareerPrefill, setFeedbackCareerPrefill] = useState(null);
+  const [completedRoadmapSteps, setCompletedRoadmapSteps] = useState([]);
 
   useEffect(() => {
     api("/advisor/guidance").then(setData);
@@ -1325,21 +1575,60 @@ function GuidancePanel() {
       `${data.career} Specialist`,
       `${data.career} Analyst`
     ]);
-    setSimilarProfiles(makeGuidanceSimilarProfiles(data.career));
-    const careers = [data.career, ...(careerRoleMap[data.career] || [])];
+    const careers = data.recommendedCareers?.length ? data.recommendedCareers : [data.career, ...(careerRoleMap[data.career] || [])];
     setCareerOptions(Array.from(new Set(careers)).slice(0, 4));
+    if (data.latestFeatures && Object.keys(data.latestFeatures).length) {
+      api("/advisor/knn-recommend", {
+        method: "POST",
+        body: JSON.stringify({ features: data.latestFeatures, k: 5, num_recommendations: 4 })
+      })
+        .then((result) => setSimilarProfiles(result.similar_profiles || []))
+        .catch(() => setSimilarProfiles([]));
+    } else {
+      setSimilarProfiles([]);
+    }
+    if (data.learningPath?.length) {
+      const completedCount = Math.round(((data.roadmapProgress || 0) / 100) * data.learningPath.length);
+      setCompletedRoadmapSteps(data.learningPath.slice(0, completedCount));
+    }
   }, [data]);
 
   async function openProfileFeedback(career) {
     try {
-      const res = await fetch('/api/advisor/feedback');
-      if (!res.ok) return;
-      const json = await res.json();
+      const json = await api("/advisor/feedback");
       const entries = (json.feedback || []).filter(f => f.selectedCareer === career);
       setFeedbackForCareer({ career, entries });
       setShowProfileFeedback(true);
     } catch (err) {
       console.error('Error fetching feedback:', err);
+    }
+  }
+
+  const confidenceValue = Number(data?.confidence || 0);
+  const confidencePercent = confidenceValue > 1 ? Math.round(confidenceValue) : Math.round(confidenceValue * 100);
+  const hasSavedGuidance = Boolean(data?.hasRecommendation || data?.career);
+  const roadmapProgress = data?.learningPath?.length
+    ? Math.round((completedRoadmapSteps.length / data.learningPath.length) * 100)
+    : 0;
+
+  async function toggleRoadmapStep(step) {
+    if (!data?.learningPath?.length) return;
+    const exists = completedRoadmapSteps.includes(step);
+    const nextSteps = exists
+      ? completedRoadmapSteps.filter((item) => item !== step)
+      : [...completedRoadmapSteps, step];
+    setCompletedRoadmapSteps(nextSteps);
+    const progress = Math.round((nextSteps.length / data.learningPath.length) * 100);
+    try {
+      await api("/advisor/profile", {
+        method: "PUT",
+        body: JSON.stringify({ roadmapProgress: progress })
+      });
+    } catch (error) {
+      console.warn("Unable to save roadmap progress:", error.message || error);
+    }
+    if (!exists && progress === 100) {
+      setShowFeedback(true);
     }
   }
 
@@ -1350,10 +1639,10 @@ function GuidancePanel() {
 
       <div className="guidance-dashboard-grid">
         <div className="guidance-summary-card">
-          <span>Recommended career</span>
+          <span>{data?.hasRecommendation ? "Previous career recommendation" : "Recommended career"}</span>
           <h3>{data?.career || "Career Path"}</h3>
           <div className="recommendation-score">
-            <strong>{data?.confidence ? `${Math.round(data.confidence * 100)}% fit` : "Fit score pending"}</strong>
+            <strong>{confidencePercent ? `${confidencePercent}% fit` : "Fit score pending"}</strong>
           </div>
           <p>{data?.suggestions?.[0] || "Complete the profile test to unlock your best career guidance."}</p>
         </div>
@@ -1365,22 +1654,25 @@ function GuidancePanel() {
               <div key={career} className="career-card-item">
                 <strong>{career}</strong>
                 <small>{index === 0 ? "Primary match" : "Similar path"}</small>
-                <span>{Math.round(((data?.confidence || 0.7) - index * 0.08) * 100)}%</span>
+                <span>{Math.max(45, confidencePercent - index * 8)}%</span>
               </div>
             ))}
+            {!careerOptions.length && (
+              <p>{hasSavedGuidance ? "Saved career will appear here shortly." : "Complete career profiling to see career matches."}</p>
+            )}
           </div>
         </div>
 
         <div className="guidance-summary-card">
           <span>Similar profiles</span>
           <div className="similar-profiles-list">
-            {similarProfiles.map((profile) => (
+            {similarProfiles.length ? similarProfiles.map((profile) => (
               <div key={profile.profile_id} className="similar-profile-item" onClick={() => openProfileFeedback(profile.career)} style={{ cursor: 'pointer' }}>
                 <strong>{profile.profile_id}</strong>
                 <small>{profile.career}</small>
                 <span>{profile.similarity_score}% similar</span>
               </div>
-            ))}
+            )) : <p>No similar feedback profiles yet. After another user shares feedback for a similar profile, it appears here.</p>}
           </div>
         </div>
       </div>
@@ -1412,17 +1704,20 @@ function GuidancePanel() {
               <p className="eyebrow">Visual roadmap</p>
               <h3>{data.career || "Career"} learning flow</h3>
             </div>
-            <span>{data.learningPath.length} stages</span>
+            <span>{roadmapProgress}% complete</span>
           </div>
           <div className="guidance-flow visual-flowchart">
             {data.learningPath.map((step, index) => (
               <React.Fragment key={step}>
-                <div className="flow-step">
+                <div className={`flow-step ${completedRoadmapSteps.includes(step) ? "completed" : ""}`}>
                   <div className="flow-step-number">{index + 1}</div>
                   <div className="flow-step-body">
                     <small>{index === 0 ? "Foundation" : index === data.learningPath.length - 1 ? "Portfolio" : "Skill stage"}</small>
                     <strong>{step}</strong>
                     <p>{index === 0 ? "Start here and complete the core basics." : "Practice this stage with one task or mini project."}</p>
+                    <button className="roadmap-check-btn" onClick={() => toggleRoadmapStep(step)}>
+                      {completedRoadmapSteps.includes(step) ? "Completed" : "Mark complete"}
+                    </button>
                   </div>
                 </div>
                 {index < data.learningPath.length - 1 && <div className="flow-connector">&rarr;</div>}
@@ -1434,43 +1729,59 @@ function GuidancePanel() {
 
       {data?.learningResources?.length ? (
         <>
-          <h4>Free learning resources</h4>
-          <div className="video-grid">
-            {data.learningResources.map((resource) => (
-              <a
-                key={resource.skill}
-                className="video-card"
-                href={resource.youtube}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <img src={`https://img.youtube.com/vi/${resource.videoId}/hqdefault.jpg`} alt={resource.skill} />
-                <div>
-                  <strong>{resource.skill}</strong>
-                  <small>Free YouTube course</small>
+          <div className="resource-board">
+            <div>
+              <h4>Free YouTube courses</h4>
+              <div className="video-grid">
+                {data.learningResources.map((resource) => (
+                  <a
+                    key={resource.skill}
+                    className="video-card"
+                    href={resource.youtube}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img src={`https://img.youtube.com/vi/${resource.videoId}/hqdefault.jpg`} alt={resource.skill} />
+                    <div>
+                      <strong>{resource.skill}</strong>
+                      <small>Free YouTube course</small>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+            <aside className="resource-side-panel">
+              <div className="certification-list">
+                <h4>Free certifications</h4>
+                <div className="cert-grid">
+                  {data.learningResources.flatMap((resource) => resource.certifications || []).slice(0, 10).map((cert) => (
+                    <a key={cert.url} href={cert.url} target="_blank" rel="noreferrer" className="cert-link">
+                      {cert.title}
+                    </a>
+                  ))}
                 </div>
-              </a>
-            ))}
+              </div>
+              <div className="certification-list">
+                <h4>Learning websites</h4>
+                <div className="cert-grid">
+                  {data.learningResources.flatMap((resource) => resource.websites || []).slice(0, 10).map((site) => (
+                    <a key={`${site.title}-${site.url}`} href={site.url} target="_blank" rel="noreferrer" className="cert-link website-link">
+                      {site.title}
+                    </a>
+                  ))}
                 </div>
-                <div className="certification-list">
-                  <h4>Free certifications</h4>
-                  <div className="cert-grid">
-                    {data.learningResources.flatMap((resource) => resource.certifications || []).map((cert) => (
-                      <a key={cert.url} href={cert.url} target="_blank" rel="noreferrer" className="cert-link">
-                        {cert.title}
-                      </a>
-                    ))}
-                  </div>
-                </div>
+              </div>
+            </aside>
+          </div>
         </>
       ) : null}
 
       {showFeedback && (
         <FeedbackFormModal 
-          career={data?.career || "Software Engineer"}
-                recommendedCareers={jobRoles}
-                userFeatures={{}}
-          onClose={() => setShowFeedback(false)}
+          career={feedbackCareerPrefill || data?.career || "Software Engineer"}
+          recommendedCareers={careerOptions.map((career) => ({ career, confidence: career === data?.career ? data?.confidence || 0 : 0 }))}
+          userFeatures={data?.latestFeatures || {}}
+          onClose={() => { setShowFeedback(false); setFeedbackCareerPrefill(null); }}
         />
       )}
 
@@ -1569,7 +1880,6 @@ function RecommendationChooser({ recommendation, result, onConfirm, onClose }) {
   const [similarProfiles, setSimilarProfiles] = useState([]);
   const [analyticsMap, setAnalyticsMap] = useState({});
   const [communityFeedbackMap, setCommunityFeedbackMap] = useState({});
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
   useEffect(() => {
     if (!result?.scores) return;
@@ -1679,13 +1989,14 @@ function RecommendationChooser({ recommendation, result, onConfirm, onClose }) {
         </div>
 
         <div className="chooser-section">
-          <h4>Similar anonymous profiles</h4>
+          <h4>Similar user feedback</h4>
           <div className="chooser-scroll-list">
             {similarProfiles.length ? similarProfiles.map((profile, index) => (
               <div key={`${profile.profile_id || "profile"}-${index}`} className="similar-profile-row">
-                <strong>{profile.profile_id || `Profile ${index + 1}`}</strong>
+                <strong>{profile.userName || profile.profile_id || `User ${index + 1}`}</strong>
                 <span>{profile.career} | Similarity {profile.similarity_score}%</span>
-                {profile.feedback && <small>{profile.feedback}</small>}
+                {profile.outcome && <small>Outcome: {profile.outcome}</small>}
+                {profile.feedback && <small>Feedback: {profile.feedback}</small>}
               </div>
             )) : <p>No similar profiles found.</p>}
           </div>
@@ -1700,7 +2011,7 @@ function RecommendationChooser({ recommendation, result, onConfirm, onClose }) {
                 <span>Samples: {info.summary.total} | Avg time: {info.summary.averageTimeMonths} months</span>
                 {info.samples?.slice(0, 3).map((sample, index) => (
                   <div key={`${career}-${index}`} className="community-feedback-sample">
-                    <strong>{sample.outcome}</strong>
+                    <strong>{sample.userName || "User"} - {sample.outcome}</strong>
                     {sample.roleTitle && <small>{sample.roleTitle}</small>}
                     {sample.feedbackNotes && <p>{sample.feedbackNotes}</p>}
                   </div>
@@ -1712,13 +2023,8 @@ function RecommendationChooser({ recommendation, result, onConfirm, onClose }) {
 
         <div className="dialog-actions">
           <button className="secondary" onClick={onClose}>Cancel</button>
-          <button className="secondary" onClick={() => setShowFeedbackForm(true)} disabled={!selectedCareer}>Provide Feedback</button>
           <button className="primary" onClick={() => onConfirm(selectedCareer)} disabled={!selectedCareer}>Confirm and Continue</button>
         </div>
-
-        {showFeedbackForm && (
-          <FeedbackFormModal career={selectedCareer} recommendedCareers={careers} userFeatures={result?.scores || {}} onClose={() => setShowFeedbackForm(false)} />
-        )}
       </div>
     </div>
   );
@@ -1731,6 +2037,11 @@ function FeedbackFormModal({ career, recommendedCareers = [], userFeatures = {},
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const cleanRecommendedCareers = recommendedCareers
+    .map((item) => typeof item === "string"
+      ? { career: item, confidence: item === career ? 100 : 0 }
+      : { career: item?.career, confidence: Number(item?.confidence || 0) })
+    .filter((item) => item.career);
 
   const handleSubmit = async (event) => {
     event?.preventDefault();
@@ -1747,7 +2058,7 @@ function FeedbackFormModal({ career, recommendedCareers = [], userFeatures = {},
         method: "POST",
         body: JSON.stringify({
           userFeatures,
-          recommendedCareers,
+          recommendedCareers: cleanRecommendedCareers,
           selectedCareer: career,
           outcome,
           roleTitle,
@@ -1938,20 +2249,66 @@ function Dashboard({ user, onLogout }) {
   const [activeFeature, setActiveFeature] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [latest, setLatest] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [pendingRecommendation, setPendingRecommendation] = useState(null);
   const [pendingResultObj, setPendingResultObj] = useState(null);
-  function handleConfirmRecommendation(selectedCareer) {
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function restoreUserProfile() {
+      try {
+        const data = await api("/advisor/profile");
+        if (!mounted) return;
+
+        setProfile(data.profile);
+        if (!latest && data.profile?.targetRole) {
+          setLatest({
+            recommendation: {
+              career: data.profile.targetRole,
+              confidence: 0.72,
+              explanation: `Your saved career target is ${data.profile.targetRole}.`,
+              skillsToBuild: data.profile.skills || []
+            },
+            scores: {},
+            profile: data.profile
+          });
+        }
+      } catch (error) {
+        console.warn("Could not restore profile:", error.message || error);
+      }
+    }
+
+    restoreUserProfile();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  async function handleConfirmRecommendation(selectedCareer) {
     if (!pendingResultObj || !pendingRecommendation) {
       setPendingRecommendation(null);
       setPendingResultObj(null);
       return;
     }
+
     const final = { ...pendingResultObj, recommendation: { ...pendingRecommendation, career: selectedCareer } };
     setLatest(final);
     // clear pending
     setPendingRecommendation(null);
     setPendingResultObj(null);
+
+    try {
+      await api("/advisor/profile", {
+        method: "PUT",
+        body: JSON.stringify({ targetRole: selectedCareer })
+      });
+      setProfile((prev) => ({ ...prev, targetRole: selectedCareer }));
+    } catch (error) {
+      console.warn("Unable to save selected career:", error.message || error);
+    }
   }
+
   const hideInsightRail = ["career-profile", "manual-profile", "resume", "college", "guidance"].includes(activeFeature);
 
   return (
@@ -2029,15 +2386,16 @@ function Dashboard({ user, onLogout }) {
 
         <section className={`portal-content ${hideInsightRail ? "portal-content--wide" : ""}`}>
           <div className="primary-workspace">
-            {["career-profile", "manual-profile", "resume", "college"].includes(activeFeature) && (
+            {["career-profile", "manual-profile", "resume", "college", "skill-quiz"].includes(activeFeature) && (
               <button className="explore-btn" onClick={() => setActiveFeature("dashboard")}>
                 <ArrowRight size={18} /> Back to options
               </button>
             )}
-            {activeFeature === "career-profile" && <CareerProfileForm mode="guided" onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
-            {activeFeature === "manual-profile" && <CareerProfileForm mode="manual" onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
+            {activeFeature === "career-profile" && <CareerProfileForm profile={profile} mode="guided" onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
+            {activeFeature === "manual-profile" && <CareerProfileForm profile={profile} mode="manual" onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
+            {activeFeature === "skill-quiz" && <SkillQuizPanel />}
             {activeFeature === "chat" && <ChatPanel />}
-            {activeFeature === "skills" && <SkillInputPanel onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
+            {activeFeature === "skills" && <SkillInputPanel profile={profile} onNavigate={setActiveFeature} onSaved={(result) => setLatest(result)} onRecommend={(rec, res) => { setPendingRecommendation(rec); setPendingResultObj(res); }} />}
             {activeFeature === "college" && <CollegeRecommendationPanel />}
             {activeFeature === "resume" && <ResumePanel onNavigate={setActiveFeature} />}
             {activeFeature === "jobs" && <JobFinderPanel />}

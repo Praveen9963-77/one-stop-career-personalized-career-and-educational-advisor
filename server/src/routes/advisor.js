@@ -6,6 +6,7 @@ import TestResult from "../models/TestResult.js";
 import UserProfile from "../models/UserProfile.js";
 import RecommendationFeedback from "../models/RecommendationFeedback.js";
 import CareerAnalytics from "../models/CareerAnalytics.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
@@ -135,6 +136,58 @@ const jobCatalog = [
   { role: "Quality Analyst", company: "Wipro", location: "Hyderabad", type: "Entry level", salary: "3-5 LPA", skills: "Test cases, automation, bug reporting" }
 ];
 
+function buildJobLinks(role, location = "") {
+  const roleQuery = encodeURIComponent(role);
+  const locationQuery = encodeURIComponent(location || "India");
+  return [
+    {
+      label: "Naukri",
+      url: `https://www.naukri.com/${role.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-jobs`
+    },
+    {
+      label: "LinkedIn",
+      url: `https://www.linkedin.com/jobs/search/?keywords=${roleQuery}&location=${locationQuery}`
+    },
+    {
+      label: "Indeed",
+      url: `https://in.indeed.com/jobs?q=${roleQuery}&l=${locationQuery}`
+    },
+    {
+      label: "Internshala",
+      url: `https://internshala.com/internships/keywords-${role.toLowerCase().replace(/[^a-z0-9]+/g, "-")}/`
+    }
+  ];
+}
+
+function scoreJobAgainstProfile(job, context, search = "") {
+  const { career, catalog, profile, latestResume } = context;
+  const userSkills = [
+    ...(profile?.skills || []),
+    ...(profile?.completedSkills || []),
+    ...(latestResume?.analysis?.extractedSkills || []),
+    ...(catalog?.skills || [])
+  ].map((skill) => String(skill).toLowerCase());
+  const jobText = `${job.role} ${job.skills} ${job.type}`.toLowerCase();
+  const jobSkills = job.skills.split(",").map((skill) => skill.trim().toLowerCase());
+  const matchedSkills = jobSkills.filter((skill) =>
+    userSkills.some((userSkill) => userSkill.includes(skill) || skill.includes(userSkill))
+  );
+  const roleMatch = job.role.toLowerCase().includes(career.toLowerCase()) || (catalog.jobs || []).includes(job.role);
+  const searchMatch = search && jobText.includes(search);
+  const skillScore = jobSkills.length ? (matchedSkills.length / jobSkills.length) * 35 : 0;
+  const roleScore = roleMatch ? 35 : 12;
+  const searchScore = searchMatch ? 12 : 0;
+  const resumeScore = latestResume ? 8 : 0;
+  const progressScore = Math.min(10, Math.round((profile?.roadmapProgress || 0) / 10));
+  const fitScore = Math.min(98, Math.max(52, Math.round(roleScore + skillScore + searchScore + resumeScore + progressScore)));
+
+  return {
+    fitScore,
+    matchedSkills,
+    missingSkills: jobSkills.filter((skill) => !matchedSkills.includes(skill)).slice(0, 3)
+  };
+}
+
 const collegeCatalog = [
   { name: "IIT Madras", course: "B.Tech CSE", location: "Chennai", fees: 220000, placement: "30 LPA avg", cutoff: 99.7, eamcetRank: null, rating: 4.9, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 1" },
   { name: "IIT Delhi", course: "B.Tech CSE", location: "New Delhi", fees: 220000, placement: "31 LPA avg", cutoff: 99.6, eamcetRank: null, rating: 4.9, acceptedExams: ["JEE"], type: "National", source: "NIRF 2024 Engineering Rank 2" },
@@ -221,6 +274,14 @@ const skillVideoMap = {
 
 function makeLearningResources(skills = []) {
   const defaultVideos = ["w7ejDZ8SWv8", "rfscVS0vtbw", "W6NZfCO5SIk", "HXV3zeQKqGY"];
+  const websiteCatalog = [
+    { title: "freeCodeCamp", url: "https://www.freecodecamp.org/learn/" },
+    { title: "MDN Web Docs", url: "https://developer.mozilla.org/en-US/docs/Learn" },
+    { title: "Microsoft Learn", url: "https://learn.microsoft.com/en-us/training/" },
+    { title: "Kaggle Learn", url: "https://www.kaggle.com/learn" },
+    { title: "Cisco Skills For All", url: "https://skillsforall.com/" },
+    { title: "AWS Skill Builder", url: "https://skillbuilder.aws/" }
+  ];
   return [...new Set(skills.filter(Boolean))].slice(0, 8).map((skill, idx) => {
     const lowerSkill = skill.toLowerCase();
     const videoId = skillVideoMap[lowerSkill] || defaultVideos[idx % defaultVideos.length];
@@ -247,7 +308,10 @@ function makeLearningResources(skills = []) {
       videoId,
       youtube: `https://www.youtube.com/watch?v=${videoId}`,
       searchUrl: `https://www.youtube.com/results?search_query=${query}`,
-      certifications: certifications.length ? certifications : freeCertificationCatalog.slice(0, 3)
+      certifications: certifications.length ? certifications : freeCertificationCatalog.slice(0, 3),
+      websites: websiteCatalog.slice(idx % 3, idx % 3 + 3).length === 3
+        ? websiteCatalog.slice(idx % 3, idx % 3 + 3)
+        : websiteCatalog.slice(0, 3)
     };
   });
 }
@@ -394,9 +458,9 @@ async function getContext(userId) {
   ]);
 
   const career =
+    profile?.targetRole ||
     latestTest?.recommendation?.career ||
     latestResume?.analysis?.matchedCareer ||
-    profile?.targetRole ||
     "Software Developer";
   const catalog = careerCatalog[career] || careerCatalog["Software Developer"];
 
@@ -429,18 +493,40 @@ router.put("/profile", requireAuth, async (req, res) => {
 
 router.get("/guidance", requireAuth, async (req, res) => {
   const { profile, latestTest, latestResume, career, catalog } = await getContext(req.user.id);
-  const learningSkills = latestTest?.recommendation?.skillsToBuild || latestResume?.analysis?.missingSkills || catalog.skills;
+  const savedRecommendation = normalizeRecommendation(latestTest?.recommendation || {});
+  const hasRecommendation = Boolean(profile?.targetRole || savedRecommendation?.career || latestResume?.analysis?.matchedCareer);
+  const confidence = savedRecommendation?.confidence || latestResume?.analysis?.matchScore || (hasRecommendation ? 0.72 : 0);
+  const alternatives = Array.isArray(savedRecommendation?.alternatives) ? savedRecommendation.alternatives : [];
+  const learningSkills = savedRecommendation?.skillsToBuild || latestResume?.analysis?.missingSkills || catalog.skills;
   const learningResources = makeLearningResources(learningSkills);
+  const restoredSource = profile?.targetRole
+    ? "saved career selection"
+    : latestTest
+      ? "previous career profiling result"
+      : latestResume
+        ? "previous resume analysis"
+        : "new profile";
 
   res.json({
     career,
-    confidence: latestTest?.recommendation?.confidence || latestResume?.analysis?.matchScore || 0.72,
+    confidence,
+    hasRecommendation,
+    restoredSource,
+    roadmapProgress: profile?.roadmapProgress || 0,
+    latestFeatures: latestTest?.scores ? Object.fromEntries(latestTest.scores) : {},
+    recommendedCareers: [
+      career,
+      ...alternatives.map((item) => item.career),
+      ...(careerCatalog[career]?.roles || [])
+    ].filter(Boolean).slice(0, 4),
     suggestions: [
-      `Your current profile aligns well with ${career}.`,
+      hasRecommendation
+        ? `Restored your ${restoredSource}: ${career}.`
+        : "Complete the career profiling test to unlock AI-based suggestions.",
       `Strengthen ${catalog.skills.slice(0, 3).join(", ")} for better opportunities.`,
       profile?.targetRole ? `Keep your target role focused on ${profile.targetRole}.` : "Set a target role to make recommendations sharper."
     ],
-    learningPath: latestTest?.recommendation?.educationPath || catalog.roadmap.slice(0, 5),
+    learningPath: savedRecommendation?.educationPath || catalog.roadmap.slice(0, 5),
     learningResources
   });
 });
@@ -476,10 +562,12 @@ router.get("/skills", requireAuth, async (req, res) => {
 });
 
 router.get("/jobs", requireAuth, async (req, res) => {
-  const { career, catalog } = await getContext(req.user.id);
+  const context = await getContext(req.user.id);
+  const { career, catalog, profile, latestResume } = context;
   const search = String(req.query.skills || "").toLowerCase();
   const locationQuery = String(req.query.location || "").toLowerCase();
   const experience = String(req.query.experience || "Entry level").toLowerCase();
+  const careerJobRoles = Array.isArray(catalog.jobs) ? catalog.jobs : [];
 
   const jobs = jobCatalog
     .filter((job) => {
@@ -490,21 +578,40 @@ router.get("/jobs", requireAuth, async (req, res) => {
       const matchesExperience = !experience || job.type.toLowerCase().includes(experience);
       return matchesSearch && matchesLocation && matchesExperience;
     })
-    .map((job, index) => ({
-      ...job,
-      fit: `${Math.max(55, 95 - index * 2)}%`,
-      salary: job.salary || "4-8 LPA",
-      missingSkills: job.skills.split(", ").slice(0, 2)
-    }));
+    .map((job) => {
+      const match = scoreJobAgainstProfile(job, context, search);
+      return {
+        ...job,
+        fitScore: match.fitScore,
+        fit: `${match.fitScore}%`,
+        salary: job.salary || "4-8 LPA",
+        matchedSkills: match.matchedSkills,
+        missingSkills: match.missingSkills,
+        links: buildJobLinks(job.role, locationQuery || job.location)
+      };
+    })
+    .sort((a, b) => b.fitScore - a.fitScore);
+
+  const responseJobs = jobs.length
+    ? jobs
+    : jobCatalog.map((job) => {
+      const match = scoreJobAgainstProfile(job, context, search);
+      return {
+        ...job,
+        fitScore: match.fitScore,
+        fit: `${match.fitScore}%`,
+        salary: job.salary || "4-8 LPA",
+        matchedSkills: match.matchedSkills,
+        missingSkills: match.missingSkills,
+        links: buildJobLinks(job.role, locationQuery || job.location)
+      };
+    }).sort((a, b) => b.fitScore - a.fitScore).slice(0, 12);
 
   res.json({
     career,
-    jobs: jobs.length ? jobs : jobCatalog.slice(0, 12).map((job, index) => ({
-      ...job,
-      fit: `${Math.max(55, 95 - index * 2)}%`,
-      salary: job.salary || "4-8 LPA",
-      missingSkills: job.skills.split(", ").slice(0, 2)
-    }))
+    profileSkills: [...new Set([...(profile?.skills || []), ...(latestResume?.analysis?.extractedSkills || []), ...(catalog.skills || [])])].slice(0, 10),
+    jobs: responseJobs,
+    catalog: { jobs: careerJobRoles }
   });
 });
 
@@ -946,12 +1053,13 @@ router.post("/knn-recommend", requireAuth, async (req, res) => {
         { timeout: 10000 }
       );
       
-      return res.json(response.data);
+      const withFeedback = await attachFeedbackSimilarProfiles(response.data, features, req.user.id);
+      return res.json(withFeedback);
     } catch (mlError) {
       console.warn("ML service KNN call failed, using fallback:", mlError.message);
       
       // Fallback: Generate basic recommendations from existing model
-      const fallbackRecommendations = await generateFallbackKNNRecommendations(features);
+      const fallbackRecommendations = await generateFallbackKNNRecommendations(features, req.user.id);
       return res.json(fallbackRecommendations);
     }
   } catch (error) {
@@ -966,8 +1074,76 @@ router.post("/knn-recommend", requireAuth, async (req, res) => {
   }
 });
 
+function featureDistance(a = {}, b = {}) {
+  const keys = [...new Set([...Object.keys(a || {}), ...Object.keys(b || {})])];
+  if (!keys.length) return 999;
+  const sum = keys.reduce((total, key) => {
+    const diff = safeNumber(a[key]) - safeNumber(b[key]);
+    return total + diff * diff;
+  }, 0);
+  return Math.sqrt(sum / keys.length);
+}
+
+async function findFeedbackSimilarProfiles(features = {}, userId, careers = []) {
+  const careerFilter = careers.filter(Boolean);
+  const query = careerFilter.length
+    ? { selectedCareer: { $in: careerFilter } }
+    : {};
+  const feedback = await RecommendationFeedback.find(query)
+    .populate("user", "name email")
+    .sort({ createdAt: -1 })
+    .limit(100);
+
+  return feedback
+    .filter((item) => String(item.user?._id || item.user) !== String(userId))
+    .map((item) => {
+      const storedFeatures = item.userFeatures instanceof Map
+        ? Object.fromEntries(item.userFeatures)
+        : (item.userFeatures || {});
+      const distance = featureDistance(features, storedFeatures);
+      const similarity = Math.max(1, Math.round(100 / (1 + distance)));
+      return {
+        profile_id: item.user?.name || item.user?.email || "Similar user",
+        userName: item.user?.name || "Similar user",
+        career: item.selectedCareer,
+        similarity_score: similarity,
+        outcome: item.outcome,
+        roleTitle: item.roleTitle,
+        feedback: item.feedbackNotes || `${item.outcome}${item.roleTitle ? ` as ${item.roleTitle}` : ""}`,
+        createdAt: item.createdAt
+      };
+    })
+    .sort((a, b) => b.similarity_score - a.similarity_score)
+    .slice(0, 5);
+}
+
+async function attachFeedbackSimilarProfiles(result = {}, features = {}, userId) {
+  const careers = [
+    ...(result.knn_recommendations || []).map((item) => item.career),
+    ...(result.similar_profiles || []).map((item) => item.career)
+  ];
+  let feedbackProfiles = await findFeedbackSimilarProfiles(features, userId, careers);
+  if (!feedbackProfiles.length) {
+    feedbackProfiles = await findFeedbackSimilarProfiles(features, userId, []);
+  }
+  const similarProfiles = feedbackProfiles.length ? feedbackProfiles : (result.similar_profiles || []);
+  const profileCountByCareer = similarProfiles.reduce((acc, item) => {
+    acc[item.career] = (acc[item.career] || 0) + 1;
+    return acc;
+  }, {});
+
+  return {
+    ...result,
+    similar_profiles: similarProfiles,
+    knn_recommendations: (result.knn_recommendations || []).map((item) => ({
+      ...item,
+      similar_profile_count: profileCountByCareer[item.career] || item.similar_profile_count || 0
+    }))
+  };
+}
+
 // Fallback function for KNN recommendations
-async function generateFallbackKNNRecommendations(features) {
+async function generateFallbackKNNRecommendations(features, userId) {
   const profile = normalizeProfileValues(features);
   
   // Generate recommendations using local logic
@@ -981,6 +1157,11 @@ async function generateFallbackKNNRecommendations(features) {
       career: "Software Engineer",
       score: (profile.Coding_Skill || 0) * 0.4 + (profile.Problem_Solving || 0) * 0.3 + (profile.Web_Development || 0) * 0.2 + Math.random() * 0.1,
       skills: ["JavaScript", "System Design", "Git", "Testing"]
+    },
+    {
+      career: "Full Stack Developer",
+      score: (profile.Web_Development || 0) * 0.35 + (profile.Coding_Skill || 0) * 0.25 + (profile.Database_Management || 0) * 0.2 + (profile.Problem_Solving || 0) * 0.1 + Math.random() * 0.1,
+      skills: ["React", "Backend APIs", "SQL/MongoDB", "Authentication"]
     },
     {
       career: "AI Engineer",
@@ -1008,39 +1189,35 @@ async function generateFallbackKNNRecommendations(features) {
     career: c.career,
     score: parseFloat((c.score / totalScore).toFixed(3)),
     confidence: Math.round((c.score / totalScore) * 100),
-    similar_profile_count: Math.floor(Math.random() * 4) + 1
+    similar_profile_count: 0
   }));
 
   // Generate similar profiles
-  const similarProfiles = [
-    {
-      profile_id: "Profile 1",
-      career: recommendations[0]?.career || "Data Scientist",
-      similarity_score: Math.round(Math.random() * 10 + 85)
-    },
-    {
-      profile_id: "Profile 2",
-      career: recommendations[1]?.career || "Software Engineer",
-      similarity_score: Math.round(Math.random() * 10 + 80)
-    },
-    {
-      profile_id: "Profile 3",
-      career: recommendations[2]?.career || "AI Engineer",
-      similarity_score: Math.round(Math.random() * 10 + 75)
-    }
-  ];
+  let similarProfiles = await findFeedbackSimilarProfiles(features, userId, recommendations.map((item) => item.career));
+  if (!similarProfiles.length) {
+    similarProfiles = await findFeedbackSimilarProfiles(features, userId, []);
+  }
+  const profileCountByCareer = similarProfiles.reduce((acc, item) => {
+    acc[item.career] = (acc[item.career] || 0) + 1;
+    return acc;
+  }, {});
+  const recommendationsWithCounts = recommendations.map((item) => ({
+    ...item,
+    similar_profile_count: profileCountByCareer[item.career] || 0
+  }));
 
   // Basic roadmaps
   const roadmaps = {
     "Data Scientist": ["Statistics & Probability", "Python + SQL", "Data Visualization", "Machine Learning basics", "Build portfolio projects"],
     "Software Engineer": ["Data Structures", "System Design", "Code Quality", "Version Control", "Testing practices"],
+    "Full Stack Developer": ["HTML, CSS, JavaScript", "React frontend", "Node/Express or Django backend", "SQL/MongoDB database design", "Deploy full stack projects"],
     "AI Engineer": ["Python & ML basics", "Deep Learning", "NLP or Computer Vision", "Model Deployment", "Production pipelines"],
     "Web Developer": ["HTML, CSS, JavaScript", "Frontend frameworks (React)", "Backend basics (Node.js)", "Full stack projects", "Deployment"],
     "Cybersecurity Analyst": ["Networking fundamentals", "Linux & scripting", "Web security", "Threat monitoring", "Security audits"]
   };
 
   return {
-    knn_recommendations: recommendations,
+    knn_recommendations: recommendationsWithCounts,
     similar_profiles: similarProfiles,
     roadmaps: roadmaps,
     status: "success",
@@ -1071,6 +1248,18 @@ router.post("/feedback", requireAuth, async (req, res) => {
 
     // Update career analytics
     await updateCareerAnalytics(selectedCareer, outcome, timeTakenMonths, roleTitle, feedback._id);
+    await UserProfile.findOneAndUpdate(
+      { user: req.user.id },
+      {
+        $set: {
+          targetRole: selectedCareer,
+          latestFeedbackCareer: selectedCareer,
+          latestFeedbackOutcome: outcome
+        },
+        $setOnInsert: { user: req.user.id }
+      },
+      { upsert: true, new: true }
+    );
 
     res.status(201).json({ feedback, message: "Feedback saved successfully" });
   } catch (error) {
@@ -1095,9 +1284,10 @@ router.get("/feedback/career/:career", requireAuth, async (req, res) => {
   try {
     const { career } = req.params;
     const entries = await RecommendationFeedback.find({ selectedCareer: career })
+      .populate("user", "name email")
       .sort({ createdAt: -1 })
       .limit(200)
-      .select("outcome roleTitle timeTakenMonths feedbackNotes createdAt -_id");
+      .select("user outcome roleTitle timeTakenMonths feedbackNotes createdAt");
 
     // Return anonymized summary and a few samples
     const summary = entries.reduce((acc, e) => {
@@ -1114,7 +1304,15 @@ router.get("/feedback/career/:career", requireAuth, async (req, res) => {
         averageTimeMonths: summary.total ? Math.round(summary.totalTime / summary.total) : 0,
         distribution: Object.fromEntries(["Got Job", "Got Internship", "Still Learning", "Not Interested"].map(k => [k, summary[k] || 0]))
       },
-      samples: entries.slice(0, 10).map((e) => ({ outcome: e.outcome, roleTitle: e.roleTitle, timeTakenMonths: e.timeTakenMonths, feedbackNotes: e.feedbackNotes, createdAt: e.createdAt }))
+      samples: entries.slice(0, 10).map((e) => ({
+        userName: e.user?.name || "User",
+        userEmail: e.user?.email || "",
+        outcome: e.outcome,
+        roleTitle: e.roleTitle,
+        timeTakenMonths: e.timeTakenMonths,
+        feedbackNotes: e.feedbackNotes,
+        createdAt: e.createdAt
+      }))
     });
   } catch (error) {
     console.error("Error fetching career feedback:", error);
@@ -1136,10 +1334,23 @@ router.get("/analytics", requireAuth, async (req, res) => {
 router.get("/analytics/:career", requireAuth, async (req, res) => {
   try {
     const { career } = req.params;
-    const analytics = await CareerAnalytics.findOne({ career });
-    
+    let analytics = await CareerAnalytics.findOne({ career });
+
     if (!analytics) {
-      return res.status(404).json({ message: "Analytics not found for this career" });
+      analytics = new CareerAnalytics({
+        career,
+        totalUsers: 0,
+        successCount: 0,
+        internshipCount: 0,
+        jobCount: 0,
+        stillLearningCount: 0,
+        notInterestedCount: 0,
+        averageTimeTakenMonths: 0,
+        totalTimeMonths: 0,
+        successRate: 0,
+        mostCommonOutcome: "",
+        feedback: []
+      });
     }
 
     res.json({ analytics });

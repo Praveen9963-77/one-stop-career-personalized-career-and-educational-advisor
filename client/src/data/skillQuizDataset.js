@@ -1,0 +1,222 @@
+export const skillQuizDataset = [
+  {
+    id: "html-1",
+    title: "HTML Fundamentals",
+    category: "Web Development",
+    difficulty: "Easy",
+    source: "Open web fundamentals dataset",
+    question: "Which HTML element is used to define the main heading of a page?",
+    options: ["<head>", "<h1>", "<title>", "<header>"],
+    answer: "<h1>",
+    explanation: "The <h1> element represents the highest-level visible heading on a page."
+  },
+  {
+    id: "css-1",
+    title: "CSS Layout",
+    category: "Web Development",
+    difficulty: "Medium",
+    source: "Open web fundamentals dataset",
+    question: "Which CSS layout system is best suited for arranging items in rows and columns?",
+    options: ["Flexbox only", "CSS Grid", "Float", "Inline-block"],
+    answer: "CSS Grid",
+    explanation: "CSS Grid is designed for two-dimensional row and column layouts."
+  },
+  {
+    id: "js-1",
+    title: "JavaScript Basics",
+    category: "Programming",
+    difficulty: "Easy",
+    source: "Open programming fundamentals dataset",
+    question: "What does `Array.prototype.map()` return in JavaScript?",
+    options: ["A single number", "A new array", "The original array only", "A boolean"],
+    answer: "A new array",
+    explanation: "map() creates a new array by applying a callback to each element."
+  },
+  {
+    id: "react-1",
+    title: "React Components",
+    category: "Web Development",
+    difficulty: "Medium",
+    source: "Open React fundamentals dataset",
+    question: "In React, which hook is commonly used to manage local component state?",
+    options: ["useRoute", "useState", "useClass", "useRender"],
+    answer: "useState",
+    explanation: "useState stores and updates local state inside functional components."
+  },
+  {
+    id: "node-1",
+    title: "Backend APIs",
+    category: "Full Stack",
+    difficulty: "Medium",
+    source: "Open backend fundamentals dataset",
+    question: "Which Express.js method is commonly used to define a POST API route?",
+    options: ["app.send()", "app.post()", "app.routePost()", "app.fetch()"],
+    answer: "app.post()",
+    explanation: "app.post() registers a handler for HTTP POST requests."
+  },
+  {
+    id: "dbms-1",
+    title: "DBMS",
+    category: "SQL",
+    difficulty: "Easy",
+    source: "Open DBMS fundamentals dataset",
+    question: "Which SQL command is used to retrieve data from a table?",
+    options: ["SELECT", "PUSH", "FETCH ALL", "OPEN"],
+    answer: "SELECT",
+    explanation: "SELECT is used to query rows and columns from relational tables."
+  },
+  {
+    id: "dbms-2",
+    title: "DBMS",
+    category: "SQL",
+    difficulty: "Medium",
+    source: "Open DBMS fundamentals dataset",
+    question: "Which database concept reduces repeated data by splitting tables logically?",
+    options: ["Compilation", "Normalization", "Rendering", "Serialization"],
+    answer: "Normalization",
+    explanation: "Normalization organizes data to reduce redundancy and improve consistency."
+  },
+  {
+    id: "mongodb-1",
+    title: "MongoDB",
+    category: "Database",
+    difficulty: "Easy",
+    source: "Open NoSQL fundamentals dataset",
+    question: "MongoDB stores data mainly in which format?",
+    options: ["Rows and columns only", "BSON-like documents", "Plain images", "Binary executables"],
+    answer: "BSON-like documents",
+    explanation: "MongoDB stores flexible JSON-like BSON documents in collections."
+  },
+  {
+    id: "python-1",
+    title: "Python Programming",
+    category: "Programming",
+    difficulty: "Easy",
+    source: "Open Python fundamentals dataset",
+    question: "Which Python data type stores key-value pairs?",
+    options: ["list", "tuple", "dictionary", "set"],
+    answer: "dictionary",
+    explanation: "A dictionary stores values using keys."
+  },
+  {
+    id: "dsa-1",
+    title: "Data Structures",
+    category: "Programming",
+    difficulty: "Medium",
+    source: "Open DSA fundamentals dataset",
+    question: "Which data structure follows the LIFO principle?",
+    options: ["Queue", "Stack", "Graph", "Tree"],
+    answer: "Stack",
+    explanation: "Stack means last in, first out."
+  },
+  {
+    id: "aptitude-1",
+    title: "Quantitative Aptitude",
+    category: "Aptitude",
+    difficulty: "Easy",
+    source: "Open aptitude practice dataset",
+    question: "If 25% of a number is 40, what is the number?",
+    options: ["100", "120", "140", "160"],
+    answer: "160",
+    explanation: "40 is one-fourth of the number, so the number is 40 x 4 = 160."
+  },
+  {
+    id: "aptitude-2",
+    title: "Logical Reasoning",
+    category: "Aptitude",
+    difficulty: "Medium",
+    source: "Open aptitude practice dataset",
+    question: "Find the next number: 2, 6, 12, 20, 30, ?",
+    options: ["36", "40", "42", "44"],
+    answer: "42",
+    explanation: "The differences are 4, 6, 8, 10, so the next difference is 12."
+  },
+  {
+    id: "verbal-1",
+    title: "Verbal Ability",
+    category: "Communication",
+    difficulty: "Easy",
+    source: "Open verbal ability dataset",
+    question: "Choose the correctly written sentence.",
+    options: ["She don't like coding.", "She doesn't likes coding.", "She doesn't like coding.", "She not like coding."],
+    answer: "She doesn't like coding.",
+    explanation: "With does/doesn't, the base verb form is used."
+  },
+  {
+    id: "ml-1",
+    title: "Machine Learning",
+    category: "AI/ML",
+    difficulty: "Medium",
+    source: "Open AI fundamentals dataset",
+    question: "Random Forest is mainly an ensemble of which models?",
+    options: ["Neural networks", "Decision trees", "Linear equations", "K-means clusters"],
+    answer: "Decision trees",
+    explanation: "Random Forest combines many decision trees to improve prediction stability."
+  },
+  {
+    id: "ml-2",
+    title: "Machine Learning",
+    category: "AI/ML",
+    difficulty: "Medium",
+    source: "Open AI fundamentals dataset",
+    question: "KNN recommends by comparing a new user with:",
+    options: ["Random users only", "Similar existing profiles", "Only admin choices", "Only resume length"],
+    answer: "Similar existing profiles",
+    explanation: "KNN finds nearest profiles using feature similarity."
+  },
+  {
+    id: "data-1",
+    title: "Data Analysis",
+    category: "Data Science",
+    difficulty: "Easy",
+    source: "Open data fundamentals dataset",
+    question: "Which chart is commonly used to compare values across categories?",
+    options: ["Bar chart", "Paragraph", "Code editor", "Audio wave only"],
+    answer: "Bar chart",
+    explanation: "Bar charts are useful for comparing category-wise values."
+  },
+  {
+    id: "cyber-1",
+    title: "Cybersecurity",
+    category: "Security",
+    difficulty: "Medium",
+    source: "Open cybersecurity fundamentals dataset",
+    question: "OWASP Top 10 mainly focuses on:",
+    options: ["Web application security risks", "Graphic design", "Video editing", "Hardware painting"],
+    answer: "Web application security risks",
+    explanation: "OWASP Top 10 lists common and critical web application security risks."
+  },
+  {
+    id: "cloud-1",
+    title: "Cloud Computing",
+    category: "Cloud",
+    difficulty: "Easy",
+    source: "Open cloud fundamentals dataset",
+    question: "Which cloud model provides virtual machines, storage, and networking?",
+    options: ["IaaS", "SaaS", "CSS", "HTTP"],
+    answer: "IaaS",
+    explanation: "Infrastructure as a Service provides low-level infrastructure resources."
+  },
+  {
+    id: "devops-1",
+    title: "DevOps",
+    category: "DevOps",
+    difficulty: "Medium",
+    source: "Open DevOps fundamentals dataset",
+    question: "CI/CD pipelines are mainly used to:",
+    options: ["Automate build, test, and deployment", "Design posters", "Encrypt keyboard keys", "Replace databases"],
+    answer: "Automate build, test, and deployment",
+    explanation: "CI/CD improves delivery speed by automating integration and deployment."
+  },
+  {
+    id: "blockchain-1",
+    title: "Blockchain",
+    category: "Blockchain",
+    difficulty: "Medium",
+    source: "Open blockchain fundamentals dataset",
+    question: "A smart contract is best described as:",
+    options: ["A self-executing program on a blockchain", "A paper contract only", "A CSS file", "A manual spreadsheet"],
+    answer: "A self-executing program on a blockchain",
+    explanation: "Smart contracts execute programmed rules on blockchain networks."
+  }
+];
